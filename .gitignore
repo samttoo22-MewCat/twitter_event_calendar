@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# 瀏覽器配置文件
+profile1/
+
+# 下載的文件
+downloaded_files/
+
+# 輸出文件（可選，看您是否想提交）
+# outputs/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 鎖定文件
+*.lock
+
