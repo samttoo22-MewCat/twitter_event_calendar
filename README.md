@@ -15,7 +15,7 @@
 ## 技術架構
 
 ### 核心技術
-- **爬蟲引擎**：SeleniumBase（UC 模式，規避反爬蟲機制）
+- **爬蟲引擎**：[UCanScrapeX](https://github.com/samttoo22-MewCat/UCanScrapeX)（基於 SeleniumBase UC 模式，規避反爬蟲機制）
 - **GUI 框架**：Tkinter
 - **日期解析**：datefinder + 自定義正則表達式
 - **時區處理**：pytz（台灣時間 UTC+8）
@@ -29,7 +29,8 @@ twitter_event_calendar/
 ├── requirement.txt               # Python 依賴套件
 ├── .gitignore                    # Git 忽略規則
 ├── README.md                     # 本文件
-├── index.html                    # 活動日曆網頁
+├── index (1).html                # 活動日曆網頁
+├── category_config.json          # 活動分類配置檔案
 │
 ├── UCanScrapeX/                  # 爬蟲模組
 │   ├── __init__.py              # 模組初始化
@@ -44,7 +45,8 @@ twitter_event_calendar/
 │   ├── 玩具間_events.json
 │   ├── 更衣間_events.json
 │   ├── 思_events.json
-│   └── 動物方程式_events.json
+│   ├── 動物方程式_events.json
+│   └── 其他_events.json
 │
 └── profile1/                     # 瀏覽器配置文件（會話資料）
 ```
@@ -52,7 +54,7 @@ twitter_event_calendar/
 ## 安裝說明
 
 ### 系統需求
-- Python 3.8 或更高版本
+- Python 3.11
 - Chrome 瀏覽器
 
 ### 安裝步驟
@@ -69,9 +71,18 @@ pip install -r requirement.txt
 ```
 
 依賴套件包括：
-- `seleniumbase` - 爬蟲框架
+- `seleniumbase` - 爬蟲框架（透過 [UCanScrapeX](https://github.com/samttoo22-MewCat/UCanScrapeX) 整合）
 - `datefinder` - 日期解析
 - `pytz` - 時區處理
+
+**關於 UCanScrapeX**：  
+本專案使用自訂的 UCanScrapeX 爬蟲模組，該模組已整合在 `UCanScrapeX/` 目錄中。UCanScrapeX 提供：
+- 持久化登入會話（只需登入一次）
+- UC 模式防偵測機制
+- 智能推文過濾（忽略轉推、置頂推文）
+- 自動化錯誤重試機制
+
+更多資訊請訪問：https://github.com/samttoo22-MewCat/UCanScrapeX
 
 ## 使用方法
 
@@ -104,6 +115,17 @@ python UI_main.py
 - 在介面上方的分頁中選擇場地
 - 雙擊日期項目查看該日期的活動詳情
 
+#### 手動新增活動
+1. 點擊「手動增加活動」按鈕
+2. 在彈出視窗中填寫活動資訊：
+   - **日期**：格式為 `YYYY-MM-DD`
+   - **場地**：從下拉選單選擇
+   - **標題**：活動名稱
+   - **開始/結束時間**：格式為 `HH:MM`
+   - **連結**：相關網址（選填）
+   - **分類**：選擇活動類別（sp/bd/bds/so/wk/ss/hy/or）
+3. 點擊「保存活動」完成新增
+
 #### 編輯活動
 在活動詳情視窗中可以編輯：
 - **活動日期**：格式為 `YYYY-MM-DD` 或 `N/A`
@@ -112,20 +134,39 @@ python UI_main.py
 - **開始時間**：格式為 `HH:MM`
 - **結束時間**：格式為 `HH:MM`
 - **連結**：相關網址
+- **分類**：活動類別代碼
 
 編輯完成後點擊「保存校正」按鈕。
 
 #### 刪除活動
 - 點擊「刪除活動」按鈕標記為刪除（不會永久移除）
 - 已刪除的活動不會顯示在主列表中
+- 已刪除的活動不會同步到網站
 - 可以點擊「取消刪除」恢復活動
+
+#### 管理活動分類
+1. 點擊「管理類別」按鈕開啟分類管理介面
+2. 功能包括：
+   - **新增類別**：設定代碼、名稱、顏色漸層（輸入起始和結束色碼）
+   - **編輯類別**：修改名稱和顏色（雙擊項目或選中後點編輯）
+   - **刪除類別**：移除不需要的分類
+3. 分類配置會保存在 `category_config.json` 中
+
+#### 從 HTML 導入活動
+1. 點擊「從 HTML 導入活動」按鈕
+2. 選擇包含活動資料的 HTML 檔案
+3. 系統會自動解析並按場地分類保存
+4. 導入的活動會自動標記為已校正（`check=true`）
 
 ### 同步到網站
 
 點擊「同步網站」按鈕，系統會：
-1. 讀取所有已校正的活動
-2. 按年月分組
-3. 更新 `index.html` 中的活動資料
+1. 彈出檔案選擇對話框，選擇要同步的 HTML 檔案
+2. 讀取所有已校正且未刪除的活動
+3. 檢查並處理未知類別（可選擇自動生成）
+4. 按年月分組活動資料
+5. 同步類別定義到 HTML
+6. 更新 HTML 中的活動資料和類別配置
 
 ## 支援的日期時間格式
 
@@ -145,10 +186,34 @@ python UI_main.py
 
 ## 最近更新與 Bug 修復
 
+### v2.1 - 功能增強與錯誤修復（2025-10）
+
+#### 新增功能
+- ✅ **活動分類系統**：新增活動類別管理功能（SP、束縛、繩縛、交流、工作坊等）
+- ✅ **手動新增活動**：支援通過 GUI 手動添加新活動
+- ✅ **從 HTML 導入**：可從 HTML 檔案批次導入活動資料
+- ✅ **動態月份生成**：日曆自動根據活動資料生成對應月份
+- ✅ **分類管理 UI**：完整的分類新增、編輯、刪除功能
+- ✅ **檔案選擇對話框**：導入和同步功能支援選擇目標檔案
+
+#### Bug 修復
+- ✅ **修復時區比較錯誤**：解決 naive 和 aware datetime 比較問題
+- ✅ **修復 Tkinter None 值錯誤**：處理 Entry 控件插入 None 值的問題
+- ✅ **修復刪除活動同步**：已刪除的活動不會再同步到網站
+- ✅ **修復手動活動無法編輯**：手動新增的活動現可正常刪除和編輯
+- ✅ **修復 source_file 儲存**：運行時字段不再保存到 JSON 文件
+- ✅ **改進 HTML 解析**：更穩健的 JavaScript 陣列解析和錯誤處理
+- ✅ **修復空 JSON 檔案錯誤**：正確處理空或無效的 JSON 檔案
+
+#### 介面改進
+- ✅ **響應式按鈕佈局**：按鈕排列會隨視窗大小調整
+- ✅ **分類顏色漸層**：支援自定義分類的起始和結束色碼
+- ✅ **類別自動生成**：遇到未知類別時自動提示並生成
+
 ### v2.0 - 整合 UCanScrapeX 模組（2024-10）
 
 #### 主要更新
-- ✅ 將爬蟲引擎從 Twikit 改為 UCanScrapeX (SeleniumBase)
+- ✅ 將爬蟲引擎從 Twikit 改為 [UCanScrapeX](https://github.com/samttoo22-MewCat/UCanScrapeX) (SeleniumBase)
 - ✅ 使用物件導向的 XCrawler 類
 - ✅ 改進瀏覽器資源管理，避免重複關閉錯誤
 - ✅ 移除 asyncio 依賴，簡化程式架構
@@ -185,6 +250,7 @@ python UI_main.py
     "end_time": "22:00",
     "link": "https://example.com",
     "venue": "場地名稱",
+    "category": "sp",
     "check": false,
     "delete": false
 }
@@ -199,8 +265,34 @@ python UI_main.py
 - `end_time`: 結束時間
 - `link`: 相關連結
 - `venue`: 場地名稱
+- `category`: 活動分類代碼（sp/bd/bds/so/wk/ss/hy/or）
 - `check`: 是否已校正（true/false）
 - `delete`: 是否已刪除（true/false）
+
+### 預設活動分類
+- `sp`: SP（拍打）
+- `bd`: 束縛
+- `bds`: 繩縛
+- `so`: 交流
+- `wk`: 工作坊
+- `ss`: 特殊主題
+- `hy`: 催眠
+- `or`: 其他
+
+### 分類配置格式（category_config.json）
+
+```json
+{
+    "sp": {
+        "name": "SP",
+        "color": "linear-gradient(135deg, #e74c3c, #c0392b)"
+    },
+    "bd": {
+        "name": "束縛",
+        "color": "linear-gradient(135deg, #8e44ad, #9b59b6)"
+    }
+}
+```
 
 ## 注意事項
 
@@ -209,7 +301,7 @@ python UI_main.py
 1. **時區設定**：系統使用台灣時間（UTC+8）處理所有時間
 2. **會話保持**：首次登入後，會話資料保存在 `profile1/` 目錄，請勿刪除
 3. **資料備份**：建議定期備份 `outputs/` 目錄中的 JSON 文件
-4. **反爬蟲限制**：使用 UC 模式的 SeleniumBase 來規避 X 的反爬蟲機制
+4. **爬蟲引擎**：本專案使用 [UCanScrapeX](https://github.com/samttoo22-MewCat/UCanScrapeX)，採用 UC 模式的 SeleniumBase 來規避 X 的反爬蟲機制
 5. **推文數量限制**：某些帳號可能因為推文較少而無法達到設定的抓取數量
 
 ## 常見問題
@@ -228,6 +320,24 @@ A: 系統會自動跳過無法解析的推文，您可以：
 ### Q: 如何添加新的場地？
 A: 編輯 `UI_main.py` 中的 `user_configs` 列表，添加新的場地資訊。
 
+### Q: 手動新增的活動無法編輯或刪除？
+A: v2.1 版本已修復此問題。如果仍遇到問題：
+1. 確保使用最新版本的程式
+2. 檢查 JSON 文件中是否有 `source_file` 字段（不應存在）
+3. 重新載入活動列表
+
+### Q: 如何自定義活動分類？
+A: 點擊「管理類別」按鈕：
+1. 新增類別：輸入代碼（如 `test`）、名稱、起始色碼、結束色碼
+2. 編輯類別：雙擊項目或選中後點擊編輯
+3. 刪除類別：選中後點擊刪除（不會刪除使用該分類的活動）
+
+### Q: 同步網站時出現「找不到已刪除的活動」？
+A: v2.1 版本已修復，已刪除的活動（`delete=true`）不會再同步到網站。
+
+### Q: 時區比較錯誤（naive/aware datetime）？
+A: v2.1 版本已修復。系統現在統一使用台灣時區（UTC+8）處理所有日期時間。
+
 ## 開發者資訊
 
 ### 除錯模式
@@ -237,10 +347,11 @@ A: 編輯 `UI_main.py` 中的 `user_configs` 列表，添加新的場地資訊�
 - 爬蟲過程的詳細日誌
 
 ### 擴展功能
-可以參考 `UCanScrapeX/example.py` 了解如何：
+可以參考 `UCanScrapeX/example.py` 或訪問 [UCanScrapeX GitHub](https://github.com/samttoo22-MewCat/UCanScrapeX) 了解如何：
 - 使用 XCrawler 類
 - 自定義爬蟲參數
 - 處理爬取結果
+- 配置防偵測機制
 
 ## 授權
 
@@ -252,4 +363,4 @@ A: 編輯 `UI_main.py` 中的 `user_configs` 列表，添加新的場地資訊�
 
 ---
 
-**最後更新：2024-10**
+**最後更新：2025-10**

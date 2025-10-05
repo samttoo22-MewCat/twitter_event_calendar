@@ -1,0 +1,54 @@
+[
+    {
+        "date": "2025-09-14",
+        "text": "其他 - 觸動市集 11:00~17:00",
+        "check": true,
+        "venue": "其他",
+        "start_time": "11:00",
+        "end_time": "17:00",
+        "link": "https://x.com/call_it_soul/status/1962911968265978046",
+        "title": "觸動市集",
+        "brief_description": "",
+        "delete": false,
+        "category": "or"
+    },
+    {
+        "date": "2025-09-15",
+        "text": "其他 - 觸動市集 11:00~17:00",
+        "check": true,
+        "venue": "其他",
+        "start_time": "11:00",
+        "end_time": "17:00",
+        "link": "https://x.com/call_it_soul/status/1962911968265978046",
+        "title": "觸動市集",
+        "brief_description": "",
+        "delete": false,
+        "category": "or"
+    },
+    {
+        "date": "2025-10-18",
+        "text": "其他 - 台中主題式催眠練習會- 凝視法👀 14:00~17:00",
+        "check": true,
+        "venue": "其他",
+        "start_time": "14:00",
+        "end_time": "17:00",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSeQelCgIJ6rTuky98QQwTs5KC8ZIaq2c1eRkaxsw9ijbmDkHQ/viewform",
+        "title": "台中主題式催眠練習會- 凝視法👀",
+        "brief_description": "",
+        "delete": false,
+        "category": "hy"
+    },
+    {
+        "date": "2025-10-30",
+        "venue": "其他",
+        "title": "test",
+        "start_time": "",
+        "end_time": "",
+        "link": null,
+        "category": "or",
+        "check": true,
+        "brief_description": "",
+        "delete": true,
+        "text": "其他 - test"
+    }
+]

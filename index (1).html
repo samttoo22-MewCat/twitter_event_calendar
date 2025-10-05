@@ -1,0 +1,3375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
+    <title>台中BDSM行事曆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 165, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 69, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #2c1810 0%, #4a2c2a 25%, #8b4513 50%, #cd853f 75%, #daa520 100%);
+            min-height: 100vh;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(255, 140, 0, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 75%, rgba(255, 69, 0, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 50% 10%, rgba(139, 69, 19, 0.05) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(255, 140, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, rgba(255, 165, 0, 0.08) 0%, transparent 35%),
+                linear-gradient(135deg, rgba(255, 228, 196, 0.95) 0%, rgba(255, 218, 185, 0.95) 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .header {
+            background: 
+                radial-gradient(ellipse at 25% 30%, rgba(255, 69, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 70%, rgba(255, 140, 0, 0.12) 0%, transparent 45%),
+                linear-gradient(135deg, #cc4400, #ff6600, #ff8c00);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(255, 140, 0, 0.1) 8px,
+                    rgba(255, 140, 0, 0.1) 16px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 12px,
+                    rgba(255, 165, 0, 0.08) 12px,
+                    rgba(255, 165, 0, 0.08) 24px
+                );
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .header .subtitle:hover {
+            opacity: 1;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .header p:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .update-info {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .update-info-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .update-info-title::before {
+            content: "📅";
+            font-size: 1.1rem;
+        }
+
+        .update-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .update-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.95rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-date {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .update-content {
+            flex: 1;
+        }
+
+        .legend {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .legend-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: default;
+        }
+
+        .category-legend {
+            padding: 15px;
+            background: #f0f8ff;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .category-legend-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+            cursor: default;
+        }
+
+        .category-legend-title::before {
+            content: "";
+            font-size: 1.1rem;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .category-legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+
+        .legend-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-item:active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .category-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+
+        .category-legend-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .category-legend-item:active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .venue-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        .category-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .category-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .venue-link {
+            color: #3498db;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .venue-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 80px;
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(135deg, #2980b9, #21618c);
+            transform: translateY(-1px);
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+        }
+
+        .nav-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .month-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .calendar-container {
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .calendar-slider {
+            display: flex;
+            transition: transform 0.3s ease;
+            width: auto;
+            min-height: 600px;
+            align-items: flex-start;
+        }
+
+        .calendar-month {
+            width: 100%;
+            flex-shrink: 0;
+            min-height: 600px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e9ecef;
+            padding: 15px 10px;
+        }
+
+        .day-header {
+            background: 
+                radial-gradient(circle at 40% 30%, rgba(255, 69, 0, 0.2) 0%, transparent 60%),
+                linear-gradient(135deg, #b8860b, #daa520, #ff8c00);
+            color: white;
+            padding: 12px 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 4px,
+                    rgba(255, 140, 0, 0.15) 4px,
+                    rgba(255, 140, 0, 0.15) 8px
+                );
+            pointer-events: none;
+        }
+
+        .day-cell {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 228, 196, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 218, 185, 0.2) 0%, transparent 35%),
+                linear-gradient(135deg, #fffaf0, #ffefd5);
+            min-height: 140px;
+            padding: 8px 6px;
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+
+        .day-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    30deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(255, 165, 0, 0.05) 15px,
+                    rgba(255, 165, 0, 0.05) 30px
+                );
+            border-radius: 6px;
+            pointer-events: none;
+        }
+
+        .day-cell:active {
+            transform: scale(0.98);
+        }
+
+        .day-number {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .event {
+            background: #3498db;
+            color: white;
+            padding: 4px 6px;
+            margin: 3px 0;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            word-break: break-word;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+        }
+
+        .event:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .event.jukuya { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .event.toyroom { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .event.gengyiroom { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .event.think { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .event.zoo { background: linear-gradient(135deg, #34495e, #2c3e50); }
+        .event.other { background: linear-gradient(135deg, #7f8c8d, #95a5a6); }
+
+        .event-venue {
+            font-weight: bold;
+            font-size: 0.65rem;
+            opacity: 0.9;
+            margin-bottom: 1px;
+        }
+
+        .event-title {
+            margin: 1px 0;
+            font-size: 0.7rem;
+        }
+
+        .event-time {
+            font-size: 0.6rem;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+
+        .today {
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 140, 0, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(255, 165, 0, 0.3) 0%, transparent 45%),
+                linear-gradient(135deg, #ffd700, #ffa500) !important;
+            border: 3px solid #ff8c00;
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+        }
+
+        .past-day {
+            opacity: 0.6;
+        }
+
+        .past-day .day-number {
+            color: #999;
+        }
+
+        .event.past {
+            background: #999 !important;
+            color: #ccc !important;
+            cursor: not-allowed;
+        }
+
+        .event.past:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .event.past:active {
+            transform: none;
+            opacity: 1;
+        }
+
+        .register-icon {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            overflow-y: auto;
+        }
+
+        .age-verification-modal {
+            display: flex;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .age-verification-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .age-verification-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .age-verification-text {
+            font-size: 1.1rem;
+            color: #34495e;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .age-verification-disclaimer {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .age-verification-disclaimer p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .age-verification-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .age-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .age-btn-yes {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .age-btn-yes:hover {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .age-btn-no {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .age-btn-no:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .age-btn:active {
+            transform: scale(0.98);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px auto;
+            padding: 25px 20px;
+            border-radius: 12px;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            position: relative;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close:active {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .register-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .register-button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .register-button.disabled {
+            background: #999 !important;
+            color: #ccc !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .register-button.pending {
+            background: #95a5a6 !important;
+            color: white !important;
+        }
+
+        .register-button.disabled:active {
+            transform: none;
+            opacity: 1;
+        }
+
+        .event-category-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        /* 更不顯眼的中性分類籤（用於日曆卡片） */
+        .event-category-chip {
+            display: inline-block;
+            background: #f1f3f5;
+            color: #666;
+            padding: 1px 4px;
+            border-radius: 8px;
+            font-size: 0.55rem;
+            font-weight: normal;
+            margin-left: 4px;
+            line-height: 1.2;
+        }
+
+        .error-report {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .error-report-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .error-report-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .error-report-button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .error-report-button:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .error-report-button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+
+        .friend-links {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .friend-links-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .friend-links-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .friend-link {
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 140, 0, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 70% 70%, rgba(255, 165, 0, 0.2) 0%, transparent 40%),
+                linear-gradient(135deg, #ff8c00, #ffa500, #ffb347);
+            color: #3b2500;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 24px 24px 18px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 16px rgba(255, 140, 0, 0.28);
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            border: 2px solid rgba(139, 69, 19, 0.25);
+        }
+
+        .friend-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(255, 140, 0, 0.35);
+            filter: brightness(1.02);
+        }
+
+        .friend-link:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* 南瓜條紋與梗 */
+        .friend-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px 24px 18px 18px;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(139, 69, 19, 0.16) 0%, rgba(139, 69, 19, 0.0) 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 69, 19, 0.2) 0%, rgba(139, 69, 19, 0.0) 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(139, 69, 19, 0.16) 0%, rgba(139, 69, 19, 0.0) 55%);
+            pointer-events: none;
+        }
+
+        .friend-link::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 18px;
+            height: 14px;
+            border-radius: 6px 6px 10px 10px;
+            background: linear-gradient(180deg, #3e7a2a, #2e5e20);
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        .friend-link-icon { color: #2e1a00; }
+        .friend-link-text { color: #2e1a00; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4); }
+
+        .friend-link-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .friend-link-text {
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .floating-error-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .floating-button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-button:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .floating-button:active {
+            transform: scale(0.95);
+        }
+
+        .floating-button-icon {
+            font-size: 1.2rem;
+        }
+
+        .floating-button-text {
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* 萬聖節：僅幽靈，隨機全螢幕移動與淡入淡出 */
+        .halloween-decoration {
+            position: fixed;
+            font-size: 2rem;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: transform 6s ease-in-out, opacity 3s ease-in-out;
+            will-change: transform, opacity;
+        }
+        .ghost { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        .updates-toggle-btn {
+            margin-top: 10px;
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .updates-toggle-btn:hover {
+            background: linear-gradient(135deg, #495057, #343a40);
+            transform: translateY(-1px);
+        }
+
+        /* 手機橫向模式優化（直向限定） */
+        @media (max-width: 768px) and (orientation: portrait) {
+            body {
+                padding: 5px;
+                font-size: 13px;
+            }
+            
+            .calendar-container {
+                min-height: 500px;
+            }
+            
+            .calendar-slider {
+                min-height: 500px;
+            }
+            
+            .calendar-month {
+                min-height: 500px;
+            }
+            
+            .calendar-grid {
+                padding: 10px 5px;
+                min-height: 500px;
+            }
+            
+            .day-cell {
+                min-height: 120px;
+                padding: 5px 4px;
+            }
+            
+            .day-header {
+                padding: 10px 3px;
+                font-size: 0.8rem;
+            }
+            
+            .event {
+                font-size: 0.65rem;
+                padding: 3px 4px;
+                margin: 2px 0;
+            }
+            
+            .event-venue {
+                font-size: 0.6rem;
+            }
+            
+            .event-title {
+                font-size: 0.65rem;
+            }
+            
+            .event-time {
+                font-size: 0.55rem;
+            }
+
+            /* 手機：隱藏日曆卡片上的分類籤，避免擁擠（不影響彈窗內的 .event-category-tag） */
+            .event-category-chip {
+                display: none !important;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header .subtitle {
+                font-size: 0.8rem;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .legend {
+                padding: 12px;
+            }
+
+            .legend-items {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .legend-item {
+                font-size: 0.8rem;
+            }
+
+            /* 手機：圖例標題可點擊折疊 */
+            .legend-title,
+            .category-legend-title {
+                cursor: pointer;
+                user-select: none;
+            }
+
+            /* 折疊狀態隱藏內容 */
+            .legend.collapsed .legend-items {
+                display: none;
+            }
+            .category-legend.collapsed .category-legend-items {
+                display: none;
+            }
+
+            /* 右側加入＋／－提示 */
+            .legend-title::after,
+            .category-legend-title::after {
+                content: '－';
+                font-weight: 700;
+                margin-left: auto;
+                color: #495057;
+            }
+            .legend.collapsed .legend-title::after,
+            .category-legend.collapsed .category-legend-title::after {
+                content: '＋';
+            }
+
+            .category-legend {
+                padding: 12px;
+            }
+
+            .category-legend-items {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .category-legend-item {
+                font-size: 0.8rem;
+            }
+
+            .calendar-navigation {
+                padding: 10px 15px;
+            }
+
+            .nav-button {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                min-width: 60px;
+            }
+
+            .month-title {
+                font-size: 1.1rem;
+            }
+
+            .update-info {
+                padding: 15px;
+            }
+
+            .update-info-title {
+                font-size: 1.1rem;
+            }
+
+            .update-item {
+                font-size: 0.9rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .update-date {
+                font-size: 0.75rem;
+            }
+
+            .error-report {
+                padding: 15px;
+            }
+
+            .error-report-title {
+                font-size: 1rem;
+            }
+
+            .error-report-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .error-report-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .friend-links {
+                padding: 15px;
+            }
+
+            .friend-links-title {
+                font-size: 1rem;
+            }
+
+            .friend-links-container {
+                gap: 10px;
+            }
+
+            .friend-link {
+                padding: 12px 15px;
+                min-width: 100px;
+            }
+
+            .friend-link-icon {
+                font-size: 1.3rem;
+            }
+
+            .friend-link-text {
+                font-size: 0.8rem;
+            }
+
+            .floating-button {
+                padding: 12px 16px;
+                gap: 8px;
+            }
+
+            .floating-button-icon {
+                font-size: 1.1rem;
+            }
+
+            .floating-button-text {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* 小螢幕手機優化 */
+        @media (max-width: 480px) {
+            .age-verification-content {
+                padding: 30px 20px;
+                margin: 20px 10px;
+            }
+
+            .age-verification-title {
+                font-size: 1.5rem;
+            }
+
+            .age-verification-text {
+                font-size: 1rem;
+            }
+
+            .age-verification-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .age-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .calendar-container {
+                min-height: 450px;
+            }
+            
+            .calendar-slider {
+                min-height: 450px;
+            }
+            
+            .calendar-month {
+                min-height: 450px;
+            }
+            
+            .calendar-grid {
+                min-height: 450px;
+            }
+
+            .day-cell {
+                min-height: 100px;
+                padding: 4px 3px;
+            }
+            
+            .event {
+                font-size: 0.6rem;
+                padding: 2px 3px;
+            }
+            
+            .event-venue {
+                font-size: 0.55rem;
+            }
+            
+            .event-title {
+                font-size: 0.6rem;
+            }
+            
+            .event-time {
+                font-size: 0.5rem;
+            }
+
+            .day-header {
+                padding: 8px 2px;
+                font-size: 0.75rem;
+            }
+
+            .modal-content {
+                margin: 10px;
+                width: calc(100% - 20px);
+                padding: 20px 15px;
+            }
+
+            .friend-links {
+                padding: 12px;
+            }
+
+            .friend-links-container {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 4px;
+                flex-wrap: wrap;
+                max-width: 75%;
+                margin: 0;
+                padding-left: 10px;
+            }
+
+            .friend-link {
+                flex: 0 0 calc(25% - 3px);
+                min-width: 0;
+                max-width: calc(25% - 3px);
+                padding: 6px 4px;
+                flex-direction: column;
+                justify-content: center;
+                gap: 3px;
+            }
+
+            .friend-link-icon {
+                font-size: 0.8rem;
+                margin-bottom: 0;
+            }
+
+            .friend-link-text {
+                font-size: 0.6rem;
+                text-align: center;
+                line-height: 1.0;
+            }
+
+            /* 小螢幕同樣支援折疊 */
+            .legend-title,
+            .category-legend-title {
+                cursor: pointer;
+                user-select: none;
+            }
+            .legend.collapsed .legend-items {
+                display: none;
+            }
+            .category-legend.collapsed .category-legend-items {
+                display: none;
+            }
+            .legend-title::after,
+            .category-legend-title::after {
+                content: '－';
+                font-weight: 700;
+                margin-left: auto;
+                color: #495057;
+            }
+            .legend.collapsed .legend-title::after,
+            .category-legend.collapsed .category-legend-title::after {
+                content: '＋';
+            }
+
+            .floating-error-button {
+                bottom: 80px;
+                right: 15px;
+            }
+
+            .floating-button {
+                padding: 10px 14px;
+                gap: 6px;
+            }
+
+            .floating-button-icon {
+                font-size: 1rem;
+            }
+
+            .floating-button-text {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 觸控優化 */
+        @media (hover: none) and (pointer: coarse) {
+            .event:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .day-cell:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .nav-button {
+                display: none;
+            }
+
+            .error-report-button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .friend-link:hover {
+                transform: none;
+                box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+            }
+
+            .floating-button:hover {
+                transform: none;
+                box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+            }
+
+            .floating-button {
+                animation: none;
+            }
+        }
+
+        /* 確保文字可讀性 */
+        @media (prefers-color-scheme: dark) {
+            .modal-content {
+                background: #1a1a1a;
+                color: #ffffff;
+            }
+            
+            .close {
+                color: #cccccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎃台中BDSM行事曆🎃</h1>
+            <div class="subtitle" id="randomSubtitle">農民曆說今日宜SP</div>
+            <p onclick="toggleUpdateInfo()">最後更新日：2025.10.03(點我查看)</p>
+        </div>
+
+        <div class="update-info" id="updateInfo">
+            <div class="update-info-title">更新資訊</div>
+            <ul class="update-list">
+                <li class="update-item">
+                    <span class="update-date">10/3</span>
+                    <span class="update-content">✔️新增活動<br>🏷️標籤現在會顯示在日曆中(手機版為版面整潔不會顯示)<br>🪢活動現已重新分類過、並新增繩縛專屬分類</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">10/2</span>
+                    <span class="update-content">萬聖節裝飾更新🎃、動方10月活動更新、分類功能</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">8/25</span>
+                    <span class="update-content">10月活動、即將加入：分類+自動導入功能</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">9/20</span>
+                    <span class="update-content">錯誤回報改為氣泡顯示、網頁底部加入友情連結工具按鈕</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">9/15</span>
+                    <span class="update-content">活動刊誤更新(<a href="javascript:void(0)" onclick="showErrorCorrectionModal()" style="color: #3498db; text-decoration: underline; cursor: pointer;">點我查閱</a>)、動方活動表單連結更新</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">9/3</span>
+                    <span class="update-content">添加新活動<br>新增"其他"非特定主辦方選項<br>思官方已公告，本月不會有活動(<a href="https://x.com/s9808191779632/status/1962884105189957860" target="_blank" style="color: #3498db; text-decoration: underline;">點我查看</a>)</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">9/2</span>
+                    <span class="update-content">添加9月玩具間活動<br>現在點擊主辦方名稱可前往其官方網站<br>新增更新后三天進入網站會顯示更新提示<br>現在進入網站會直接顯示當天的月份</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">8/26</span>
+                    <span class="update-content">更新動物方程式8/31活動</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">8/24</span>
+                    <span class="update-content">更新9月部分活動</span>
+                </li>
+                <li class="update-item">
+                    <span class="update-date">8/20</span>
+                    <span class="update-content">新增活動</span>
+                </li>
+            </ul>
+            <button id="updatesToggleBtn" class="updates-toggle-btn">更多更新資訊</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">場地圖例 - 點擊切換顯示</div>
+            <div class="legend-items">
+                <div class="legend-item" data-venue="jukuya" onclick="toggleVenue('jukuya')">
+                    <input type="checkbox" class="venue-checkbox" id="jukuya-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"></div>
+                    <span class="venue-link" onclick="openVenueWebsite('jukuya', event)">拘久屋</span>
+                </div>
+                <div class="legend-item" data-venue="toyroom" onclick="toggleVenue('toyroom')">
+                    <input type="checkbox" class="venue-checkbox" id="toyroom-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);"></div>
+                    <span class="venue-link" onclick="openVenueWebsite('toyroom', event)">玩具間</span>
+                </div>
+                <div class="legend-item" data-venue="gengyiroom" onclick="toggleVenue('gengyiroom')">
+                    <input type="checkbox" class="venue-checkbox" id="gengyiroom-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f39c12, #e67e22);"></div>
+                    <span class="venue-link" onclick="openVenueWebsite('gengyiroom', event)">更衣間</span>
+                </div>
+                <div class="legend-item" data-venue="think" onclick="toggleVenue('think')">
+                    <input type="checkbox" class="venue-checkbox" id="think-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #2ecc71, #27ae60);"></div>
+                    <span class="venue-link" onclick="openVenueWebsite('think', event)">思</span>
+                </div>
+                <div class="legend-item" data-venue="zoo" onclick="toggleVenue('zoo')">
+                    <input type="checkbox" class="venue-checkbox" id="zoo-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #34495e, #2c3e50);"></div>
+                    <span class="venue-link" onclick="openVenueWebsite('zoo', event)">動物方程式</span>
+                </div>
+                <div class="legend-item" data-venue="other" onclick="toggleVenue('other')">
+                    <input type="checkbox" class="venue-checkbox" id="other-checkbox" checked>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #7f8c8d, #95a5a6);"></div>
+                    <span class="venue-link">其他</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-legend">
+            <div class="category-legend-title">活動分類 - 點擊切換顯示(僅供參考)</div>
+            <div class="category-legend-items">
+                <div class="category-legend-item" data-category="sp" onclick="toggleCategory('sp')">
+                    <input type="checkbox" class="category-checkbox" id="sp-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"></div>
+                    <span>SP</span>
+                </div>
+                <div class="category-legend-item" data-category="bd" onclick="toggleCategory('bd')">
+                    <input type="checkbox" class="category-checkbox" id="bd-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #8e44ad, #9b59b6);"></div>
+                    <span>束縛</span>
+                </div>
+                <div class="category-legend-item" data-category="bds" onclick="toggleCategory('bds')">
+                    <input type="checkbox" class="category-checkbox" id="bds-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #d2b48c, #a67c52);"></div>
+                    <span>繩縛</span>
+                </div>
+                <div class="category-legend-item" data-category="so" onclick="toggleCategory('so')">
+                    <input type="checkbox" class="category-checkbox" id="so-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #2ecc71, #27ae60);"></div>
+                    <span>交流</span>
+                </div>
+                <div class="category-legend-item" data-category="wk" onclick="toggleCategory('wk')">
+                    <input type="checkbox" class="category-checkbox" id="wk-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #f39c12, #e67e22);"></div>
+                    <span>工作坊</span>
+                </div>
+                <div class="category-legend-item" data-category="ss" onclick="toggleCategory('ss')">
+                    <input type="checkbox" class="category-checkbox" id="ss-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #34495e, #2c3e50);"></div>
+                    <span>特殊主題</span>
+                </div>
+                <div class="category-legend-item" data-category="hy" onclick="toggleCategory('hy')">
+                    <input type="checkbox" class="category-checkbox" id="hy-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #ff8ab8, #ff5fa2);"></div>
+                    <span>催眠</span>
+                </div>
+                <div class="category-legend-item" data-category="or" onclick="toggleCategory('or')">
+                    <input type="checkbox" class="category-checkbox" id="or-checkbox" checked>
+                    <div class="category-color" style="background: linear-gradient(135deg, #7f8c8d, #95a5a6);"></div>
+                    <span>其他</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-navigation">
+            <button class="nav-button" id="prevBtn" onclick="changeMonth(-1)">
+                ← 上個月
+            </button>
+            <div class="month-title" id="monthTitle">2025年8月</div>
+            <button class="nav-button" id="nextBtn" onclick="changeMonth(1)">
+                下個月 →
+            </button>
+        </div>
+
+        <div class="calendar-container" id="calendarContainer">
+            <div class="calendar-slider" id="calendarSlider">
+                <!-- Calendar months will be dynamically generated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="friend-links">
+            <div class="friend-links-title">友情連結</div>
+            <div class="friend-links-container">
+                <a href="https://the-potion.com/" target="_blank" class="friend-link">
+                    <div class="friend-link-icon">🧪</div>
+                    <div class="friend-link-text">BDSM測驗</div>
+                </a>
+                <a href="https://tompuppy444.github.io/Kinkty-Demo1.0.0/" target="_blank" class="friend-link">
+                    <div class="friend-link-icon">🔧</div>
+                    <div class="friend-link-text">Kinkty小工具</div>
+                </a>
+                <a href="https://spanksystem.pages.dev/" target="_blank" class="friend-link">
+                    <div class="friend-link-icon">🎯</div>
+                    <div class="friend-link-text">SP系統</div>
+                </a>
+                <a href="https://bdsmxqr.yay.boo/" target="_blank" class="friend-link">
+                    <div class="friend-link-icon">📱</div>
+                    <div class="friend-link-text">推特QR產生器</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 固定錯誤回報氣泡球按鈕 -->
+    <div class="floating-error-button">
+        <a href="https://x.com/WhatSub_PK" target="_blank" class="floating-button">
+            <div class="floating-button-icon">📱</div>
+            <div class="floating-button-text">錯誤回報</div>
+        </a>
+    </div>
+
+    <!-- 年齡驗證彈窗 -->
+    <!-- 萬聖節裝飾元素容器 -->
+    <div id="halloweenDecorations"></div>
+
+    <div id="ageVerificationModal" class="age-verification-modal">
+        <div class="age-verification-content">
+            <div class="age-verification-title">年齡確認</div>
+            <div class="age-verification-text">
+                您是否已年滿18歲？
+            </div>
+            <div class="age-verification-disclaimer">
+                <p><strong>免責聲明：</strong></p>
+                <p>本活動日曆僅供參考整理，<br>
+                    活動規定與解釋權歸活動主辦方所有</p>
+            </div>
+            <div class="age-verification-buttons">
+                <button class="age-btn age-btn-yes" onclick="confirmAge(true)">
+                    ✓ 是，我已年滿18歲
+                </button>
+                <button class="age-btn age-btn-no" onclick="confirmAge(false)">
+                    ✗ 否，我未滿18歲
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Events data - 必須在最前面宣告，使用 var 讓變數成為 window 的屬性
+        // EVENT_DATA_START
+        var augustEvents = [
+    {
+        "date": 3,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "wk",
+        "link": "https://forms.gle/1fjC9ydxxvSuFQcV8"
+    },
+    {
+        "date": 9,
+        "venue": "玩具間",
+        "title": "SP拍打交流會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "sp",
+        "link": "https://forms.gle/KmtFxwr8ZniMQB167"
+    },
+    {
+        "date": 10,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/Z31WhYfnNyKV2jnS6"
+    },
+    {
+        "date": 16,
+        "venue": "玩具間",
+        "title": "別館-V.I.P專場",
+        "time": "None~None",
+        "class": "toyroom",
+        "category": "ss",
+        "link": "https://forms.gle/PRaU3j84XR6dhENY9"
+    },
+    {
+        "date": 22,
+        "venue": "玩具間",
+        "title": "夜間放飛日",
+        "time": "19:00~22:00",
+        "class": "toyroom",
+        "category": "so",
+        "link": "https://forms.gle/hTRqykydNxRNzaMG8"
+    },
+    {
+        "date": 31,
+        "venue": "玩具間",
+        "title": "SP拍打交流會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "sp",
+        "link": "https://forms.gle/Dd61i5AutCoLYieK6"
+    },
+    {
+        "date": 27,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/UK2RNunS9oGkasdJ7"
+    },
+    {
+        "date": 10,
+        "venue": "動物方程式",
+        "title": "練習日 🌙",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://t.co/KVM5qvXWK0"
+    },
+    {
+        "date": 16,
+        "venue": "動物方程式",
+        "title": "Soa的進階練課 📅",
+        "time": "14:00~16:30",
+        "class": "zoo",
+        "category": "wk",
+        "link": "https://t.co/fs48unuleS"
+    },
+    {
+        "date": 17,
+        "venue": "動物方程式",
+        "title": "SP拍賣會 📅",
+        "time": "14:00~17:00",
+        "class": "zoo",
+        "category": "sp",
+        "link": "https://t.co/KofUQtcIOR"
+    },
+    {
+        "date": 20,
+        "venue": "動物方程式",
+        "title": "練習日 🌙",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://t.co/KVM5qvXWK0"
+    },
+    {
+        "date": 23,
+        "venue": "動物方程式",
+        "title": "人改&穿刺實作交流分享 📅",
+        "time": "14:00~17:00",
+        "class": "zoo",
+        "category": "wk",
+        "link": "https://t.co/uxlRmy5Z1g"
+    },
+    {
+        "date": 23,
+        "venue": "動物方程式",
+        "title": "邂逅角落 🌙",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://t.co/KVM5qvXWK0"
+    },
+    {
+        "date": 29,
+        "venue": "動物方程式",
+        "title": "新手入圈聊天室 🌙",
+        "time": "19:30~21:30",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://t.co/KVM5qvXWK0"
+    },
+    {
+        "date": 30,
+        "venue": "動物方程式",
+        "title": "練習日 📅",
+        "time": "14:00~17:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://t.co/KVM5qvXWK0"
+    },
+    {
+        "date": 31,
+        "venue": "動物方程式",
+        "title": "脆麵午後：情慾催眠小聚 💜",
+        "time": "14:00~17:00",
+        "class": "zoo",
+        "category": "hy",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSce06LqCCeQ66PkQaZjsqxWu43xVwquFSbTFi5AZ07rZEFJ6w/viewform"
+    },
+    {
+        "date": 16,
+        "venue": "更衣間",
+        "title": "女王 の 踩踏日",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://t.co/uIEa4Icni2"
+    },
+    {
+        "date": 17,
+        "venue": "更衣間",
+        "title": "SP交流日",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "sp",
+        "link": "https://t.co/ziqbPTSnMh"
+    },
+    {
+        "date": 20,
+        "venue": "更衣間",
+        "title": "踩踏日 (平日場)",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://t.co/l8dEQbjrY1"
+    },
+    {
+        "date": 23,
+        "venue": "更衣間",
+        "title": "酒精日",
+        "time": "19:00~22:00",
+        "class": "gengyiroom",
+        "category": "so",
+        "link": "https://t.co/KMjUoy36yY"
+    },
+    {
+        "date": 24,
+        "venue": "更衣間",
+        "title": "女僕咖啡廳 2.0",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://t.co/34BPQJI1QY"
+    },
+    {
+        "date": 2,
+        "venue": "拘久屋",
+        "title": "開幕典禮",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": null
+    },
+    {
+        "date": 5,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "18:00~21:30",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/EBXfBV6yWk"
+    },
+    {
+        "date": 10,
+        "venue": "拘久屋",
+        "title": "矇眼躲貓貓",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/FLYbKACres"
+    },
+    {
+        "date": 12,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "18:00~21:30",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/EBXfBV6yWk"
+    },
+    {
+        "date": 17,
+        "venue": "拘久屋",
+        "title": "綁一綁，就熟了-練習活動",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "bds",
+        "link": "https://t.co/Pt7FsVKmQ2"
+    },
+    {
+        "date": 19,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "18:00~21:30",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/EBXfBV6yWk"
+    },
+    {
+        "date": 26,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "18:00~21:30",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/EBXfBV6yWk"
+    },
+    {
+        "date": 5,
+        "venue": "思",
+        "title": "劇本殺之夜",
+        "time": "None~None",
+        "class": "think",
+        "category": "so",
+        "link": "https://t.co/z6DN07ur4W"
+    },
+    {
+        "date": 7,
+        "venue": "思",
+        "title": "從零開始 📺",
+        "time": "19:00~21:30",
+        "class": "think",
+        "category": "wk",
+        "link": "https://t.co/pXJ6HVKPt0"
+    },
+    {
+        "date": 10,
+        "venue": "思",
+        "title": "行戮日 📺",
+        "time": "14:00~17:00",
+        "class": "think",
+        "category": "wk",
+        "link": "https://t.co/pXJ6HVKPt0"
+    },
+    {
+        "date": 19,
+        "venue": "思",
+        "title": "桌遊日（狼人殺）",
+        "time": "None~None",
+        "class": "think",
+        "category": "so",
+        "link": "https://t.co/KclW8k0HFB"
+    },
+    {
+        "date": 28,
+        "venue": "思",
+        "title": "單心之時（純女Talk）📺",
+        "time": "19:00~21:30",
+        "class": "think",
+        "category": "so",
+        "link": "https://t.co/BFyeJLaGP0"
+    },
+    {
+        "date": 9,
+        "venue": "思",
+        "title": "新手友善場",
+        "time": "19:00~21:30",
+        "class": "think",
+        "category": "",
+        "link": "https://x.com/s9808191779632/status/1952237095445258588"
+    }
+];
+        var septemberEvents = [
+    {
+        "date": 6,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/Ek9G3Ff5QRBc4ZBG7"
+    },
+    {
+        "date": 7,
+        "venue": "玩具間",
+        "title": "SP拍打交流會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "sp",
+        "link": "https://forms.gle/K1NaKA8J8VXWxtFg9"
+    },
+    {
+        "date": 13,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/ZWvoSHawsB1b2Ghg8"
+    },
+    {
+        "date": 17,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/oZcgBEUUUWfmHxPg6"
+    },
+    {
+        "date": 20,
+        "venue": "玩具間",
+        "title": "SP拍打交流會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "sp",
+        "link": "https://forms.gle/nWCf3Ngxu7fpYTFu9"
+    },
+    {
+        "date": 27,
+        "venue": "玩具間",
+        "title": "別館-V.I.P專場",
+        "time": "None~None",
+        "class": "toyroom",
+        "category": "ss",
+        "link": "https://forms.gle/pZmWWU1rbedPL7pF7"
+    },
+    {
+        "date": 10,
+        "venue": "動物方程式",
+        "title": "練習日",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSe0ZU2xnjZl2eLljvhylnTxxCMu-6zwYfSguZeCrZeTw9JPuA/viewform"
+    },
+    {
+        "date": 13,
+        "venue": "動物方程式",
+        "title": "情慾催眠實作工作坊(初階)",
+        "time": "14:00~17:30",
+        "class": "zoo",
+        "category": "hy",
+        "link": "https://t.co/9ACMhRuNw8"
+    },
+    {
+        "date": 20,
+        "venue": "動物方程式",
+        "title": "肆意即興：一繩基礎工作坊",
+        "time": "15:00~18:00",
+        "class": "zoo",
+        "category": "bds",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSeHI_-SV1dyex705-42bhKdJGIpYEco5kaqGs9lwoPuX8p-xA/viewform"
+    },
+    {
+        "date": 20,
+        "venue": "動物方程式",
+        "title": "練習日",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSe0ZU2xnjZl2eLljvhylnTxxCMu-6zwYfSguZeCrZeTw9JPuA/viewform"
+    },
+    {
+        "date": 26,
+        "venue": "動物方程式",
+        "title": "新手入圈聊天會",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSe0ZU2xnjZl2eLljvhylnTxxCMu-6zwYfSguZeCrZeTw9JPuA/viewform"
+    },
+    {
+        "date": 27,
+        "venue": "動物方程式",
+        "title": "女主共學會",
+        "time": "14:00~17:00",
+        "class": "zoo",
+        "category": "so",
+        "link": null
+    },
+    {
+        "date": 27,
+        "venue": "動物方程式",
+        "title": "邂逅角落",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSe0ZU2xnjZl2eLljvhylnTxxCMu-6zwYfSguZeCrZeTw9JPuA/viewform"
+    },
+    {
+        "date": 6,
+        "venue": "更衣間",
+        "title": "TK日常",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://forms.gle/5uuS6jrv5dCT5Zj98"
+    },
+    {
+        "date": 13,
+        "venue": "更衣間",
+        "title": "酒精日party night",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "so",
+        "link": "https://forms.gle/MPZeNnXbtnTCFgJ98"
+    },
+    {
+        "date": 14,
+        "venue": "更衣間",
+        "title": "女王審判日!!",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://forms.gle/4dF9x668TwUWRgjK7"
+    },
+    {
+        "date": 20,
+        "venue": "更衣間",
+        "title": "Cos主題 第九節課 祕密教室",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://forms.gle/ERMXMJqNAFLUNYXh8"
+    },
+    {
+        "date": 21,
+        "venue": "更衣間",
+        "title": "尿道調教入門<女生> 含表演示範",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "wk",
+        "link": "https://forms.gle/9EsmBvM6GpHVWpDE8"
+    },
+    {
+        "date": 27,
+        "venue": "更衣間",
+        "title": "蠟燭晚宴",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://forms.gle/62psNQ6XuETPsm7Y8"
+    },
+    {
+        "date": 28,
+        "venue": "更衣間",
+        "title": "SP 交流日",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "sp",
+        "link": "https://forms.gle/ziK96e1mbKvqqJfw8"
+    },
+    {
+        "date": 3,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/DAGnM1wM4t"
+    },
+    {
+        "date": 10,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/DAGnM1wM4t"
+    },
+    {
+        "date": 13,
+        "venue": "拘久屋",
+        "title": "吃飯，也吃辣｜BDSM 微辣晚宴 ft.熊拔",
+        "time": "18:00~22:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/5UMU4LbYu6"
+    },
+    {
+        "date": 17,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/DAGnM1wM4t"
+    },
+    {
+        "date": 24,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/DAGnM1wM4t"
+    },
+    {
+        "date": 27,
+        "venue": "拘久屋",
+        "title": "人體壽司薯條炸雞甜不辣",
+        "time": "18:00~22:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/lmUDa0vVtv"
+    },
+    {
+        "date": 29,
+        "venue": "拘久屋",
+        "title": "拘久屋人體盛",
+        "time": "18:00~22:00",
+        "class": "jukuya",
+        "category": "",
+        "link": "https://x.com/jukuya456/status/1968191832627798419"
+    },
+    {
+        "date": 14,
+        "venue": "其他",
+        "title": "觸動市集",
+        "time": "11:00~17:00",
+        "class": "other",
+        "category": "or",
+        "link": "https://x.com/call_it_soul/status/1962911968265978046"
+    },
+    {
+        "date": 15,
+        "venue": "其他",
+        "title": "觸動市集",
+        "time": "11:00~17:00",
+        "class": "other",
+        "category": "or",
+        "link": "https://x.com/call_it_soul/status/1962911968265978046"
+    }
+];
+        var octoberEvents = [
+    {
+        "date": 1,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/86ZoQzZHT9U655K29"
+    },
+    {
+        "date": 4,
+        "venue": "玩具間",
+        "title": "DS/SM認知聊天會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "so",
+        "link": "https://forms.gle/YHTFw1FoSnf8CUv7A"
+    },
+    {
+        "date": 10,
+        "venue": "玩具間",
+        "title": "別館-House of Torment 折磨之家",
+        "time": "13:30~17:00",
+        "class": "toyroom",
+        "category": "ss",
+        "link": "https://forms.gle/ViMUyjBbHNFDyDc17"
+    },
+    {
+        "date": 11,
+        "venue": "玩具間",
+        "title": "SP拍打交流會",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "sp",
+        "link": "https://forms.gle/fcGB7SfJgG64QRrv8"
+    },
+    {
+        "date": 15,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/Yt8pgLzN9sjGnR1GA"
+    },
+    {
+        "date": 18,
+        "venue": "玩具間",
+        "title": "別館V.I.P專場-Cosplay的異想世界",
+        "time": "None~None",
+        "class": "toyroom",
+        "category": "ss",
+        "link": "https://forms.gle/3mbodpF7e2CFaKSE7"
+    },
+    {
+        "date": 24,
+        "venue": "玩具間",
+        "title": "夜間放飛日",
+        "time": "19:00~22:00",
+        "class": "toyroom",
+        "category": "so",
+        "link": "https://forms.gle/gxXUGL4vjYRHRqs16"
+    },
+    {
+        "date": 26,
+        "venue": "玩具間",
+        "title": "BD玩法及體驗Lv1",
+        "time": "13:30~16:30",
+        "class": "toyroom",
+        "category": "bd",
+        "link": "https://forms.gle/PTxYXxRbPLusdaMe6"
+    },
+    {
+        "date": 10,
+        "venue": "動物方程式",
+        "title": "爾尼ㄟ練繩日 ft.EZA",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "bds",
+        "link": null
+    },
+    {
+        "date": 18,
+        "venue": "動物方程式",
+        "title": "邂逅角落",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": null
+    },
+    {
+        "date": 20,
+        "venue": "動物方程式",
+        "title": "練繩日",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "bds",
+        "link": null
+    },
+    {
+        "date": 24,
+        "venue": "動物方程式",
+        "title": "違反動保SP日",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "sp",
+        "link": null
+    },
+    {
+        "date": 30,
+        "venue": "動物方程式",
+        "title": "練繩日",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "bds",
+        "link": null
+    },
+    {
+        "date": 31,
+        "venue": "動物方程式",
+        "title": "新手入圈聊天室",
+        "time": "19:00~22:00",
+        "class": "zoo",
+        "category": "so",
+        "link": null
+    },
+    {
+        "date": 19,
+        "venue": "動物方程式",
+        "title": "繩縛表演【繩絆】",
+        "time": "14:00~18:00",
+        "class": "zoo",
+        "category": "bds",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSdXguh1GRxzif0cPjO9fEmlPG5BxeA4CW2tJi1g6z-uT0OQ4Q/viewform"
+    },
+    {
+        "date": 11,
+        "venue": "更衣間",
+        "title": "SP 交流日",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "sp",
+        "link": "https://forms.gle/jSqn5VG2PP9kWwQH8"
+    },
+    {
+        "date": 12,
+        "venue": "更衣間",
+        "title": "酒精日party night",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "so",
+        "link": "https://forms.gle/chyyo5otwrXA9j7t6"
+    },
+    {
+        "date": 18,
+        "venue": "更衣間",
+        "title": "聊聊療療 x 晚餐日",
+        "time": "17:00~20:00",
+        "class": "gengyiroom",
+        "category": "so",
+        "link": "https://forms.gle/QNygZThSRR5PFHXo7"
+    },
+    {
+        "date": 19,
+        "venue": "更衣間",
+        "title": "女王 の 踩踏日",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "ss",
+        "link": "https://forms.gle/HRyqwxbEep19fcah7"
+    },
+    {
+        "date": 25,
+        "venue": "更衣間",
+        "title": "尿道調教 微進階<女生> part2 含表演示範",
+        "time": "14:00~17:00",
+        "class": "gengyiroom",
+        "category": "wk",
+        "link": "https://forms.gle/xcMzBCiTK4Sn5Ga1A"
+    },
+    {
+        "date": 2,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/yuORTP6VAT"
+    },
+    {
+        "date": 4,
+        "venue": "拘久屋",
+        "title": "SP拍拍交流分享",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "sp",
+        "link": "https://t.co/qO3W00CqqE"
+    },
+    {
+        "date": 6,
+        "venue": "拘久屋",
+        "title": "拘久屋｜人形寵物中秋同樂會",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/T8hIpk6slB"
+    },
+    {
+        "date": 7,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/yuORTP6VAT"
+    },
+    {
+        "date": 9,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/yuORTP6VAT"
+    },
+    {
+        "date": 11,
+        "venue": "拘久屋",
+        "title": "拘束爬行大賽",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/lSiQB6RZ84"
+    },
+    {
+        "date": 15,
+        "venue": "拘久屋",
+        "title": "玩耍家常日",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "so",
+        "link": "https://t.co/yuORTP6VAT"
+    },
+    {
+        "date": 17,
+        "venue": "拘久屋",
+        "title": "撕襪-戀物盛宴 ft. Amber c.",
+        "time": "19:00~22:00",
+        "class": "jukuya",
+        "category": "ss",
+        "link": "https://t.co/94P9KEplSf"
+    },
+    {
+        "date": 18,
+        "venue": "拘久屋",
+        "title": "綁一綁，就熟了",
+        "time": "14:00~18:00",
+        "class": "jukuya",
+        "category": "bds",
+        "link": "https://t.co/Z9DuLfdpDE"
+    },
+    {
+        "date": 18,
+        "venue": "其他",
+        "title": "台中主題式催眠練習會- 凝視法👀",
+        "time": "14:00~17:00",
+        "class": "other",
+        "category": "hy",
+        "link": "https://docs.google.com/forms/d/e/1FAIpQLSeQelCgIJ6rTuky98QQwTs5KC8ZIaq2c1eRkaxsw9ijbmDkHQ/viewform"
+    }
+];
+        var novemberEvents = [];
+        var decemberEvents = [];
+        // EVENT_DATA_END
+
+        // 隨機小標題功能
+        const randomTexts = ['SP', 'TK', '參加活動', '坐著', '吃飯', '帶手銬', '龜甲縛', '拷問', '後手縛', '汪汪叫', '抱抱', '看鬼滅之刃', '情慾催眠', '回家', '跟PK玩', '打架', '破壞殺', '參加異色市集', '揍爛Brat', '府城嘉年華', '拷問', '去無限城', '抱抱紫紫', '不給糖就搗蛋'];
+        function updateRandomSubtitle() {
+            const randomIndex = Math.floor(Math.random() * randomTexts.length);
+            document.getElementById('randomSubtitle').textContent = `農民曆說今日宜${randomTexts[randomIndex]}`;
+        }
+
+        // 點擊小標題時更新內容
+        document.getElementById('randomSubtitle').addEventListener('click', updateRandomSubtitle);
+
+        // 錯誤修正提示彈窗
+        function showErrorCorrectionModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                text-align: center;
+                max-width: 400px;
+                margin: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            `;
+            
+            content.innerHTML = `
+                <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.3rem;">錯誤修正通知</h3>
+                <p style="color: #34495e; line-height: 1.5; margin-bottom: 20px;">
+                    9/27的更衣間活動名稱有錯誤，現已更新完成，造成不便敬請見諒！😅
+                </p>
+                <button onclick="this.parentElement.parentElement.remove()" style="
+                    background: linear-gradient(135deg, #3498db, #2980b9);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">我知道了</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // 點擊背景關閉
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // 年齡驗證功能
+        function confirmAge(isAdult) {
+            if (isAdult) {
+                // 隱藏年齡驗證彈窗
+                document.getElementById('ageVerificationModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                // 跳轉到Google首頁
+                window.location.href = 'https://www.google.com';
+            }
+        }
+
+        // 檢查是否在更新後三天內
+        function isWithinUpdatePeriod() {
+            // 自動讀取頁面上顯示的最後更新日
+            const updateText = document.querySelector('.header p').textContent;
+            const dateMatch = updateText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+            
+            if (!dateMatch) return false;
+            
+            const updateDate = new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`);
+            const today = new Date();
+            const diffTime = today.getTime() - updateDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays <= 3;
+        }
+
+        // 頁面載入時顯示年齡驗證彈窗
+        window.addEventListener('load', function() {
+            document.body.style.overflow = 'hidden';
+            document.getElementById('ageVerificationModal').style.display = 'flex';
+            
+            // 檢查是否在更新後三天內，如果是則顯示更新提示
+            if (isWithinUpdatePeriod()) {
+                const updateNotice = document.createElement('div');
+                updateNotice.style.cssText = `
+                    background: linear-gradient(135deg, #e74c3c, #c0392b);
+                    color: white;
+                    padding: 8px 15px;
+                    border-radius: 20px;
+                    font-size: 0.9rem;
+                    font-weight: bold;
+                    margin-bottom: 15px;
+                    animation: bounce 1s ease-in-out;
+                    display: inline-block;
+                `;
+                updateNotice.textContent = '🎉 網站更新啦！';
+                updateNotice.style.cursor = 'pointer';
+                updateNotice.addEventListener('click', function() {
+                    toggleUpdateInfo();
+                    // 關閉年齡驗證彈窗
+                    document.getElementById('ageVerificationModal').style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+                
+                // 添加彈跳動畫
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes bounce {
+                        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                        40% { transform: translateY(-10px); }
+                        60% { transform: translateY(-5px); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // 將更新提示插入到標題之前
+                const title = document.querySelector('.age-verification-title');
+                title.parentNode.insertBefore(updateNotice, title);
+            }
+            
+            // 初始化隨機小標題
+            updateRandomSubtitle();
+
+            // 初始化更新資訊摺疊顯示
+            setupUpdatesCollapsing();
+
+            // 初始化圖例折疊（手機預設收合）
+            setupLegendsCollapsible();
+            applyLegendCollapseByViewport();
+
+            // 初始化萬聖節幽靈裝飾（10月顯示）
+            checkForHalloweenDecorations();
+        });
+
+        // Venue visibility state
+        const venueVisibility = {
+            jukuya: true,
+            toyroom: true,
+            gengyiroom: true,
+            think: true,
+            zoo: true,
+            other: true
+        };
+
+        // Category visibility state
+        const categoryVisibility = {
+            sp: true,
+            bd: true,
+            bds: true,
+            so: true,
+            wk: true,
+            ss: true,
+            hy: true,
+            or: true
+        };
+
+        // Category display names
+        const categoryNames = {
+            bd: '束縛',
+            bds: '繩縛',
+            hy: '催眠',
+            or: '其他',
+            so: '交流',
+            sp: 'SP',
+            ss: '特殊主題',
+            wk: '工作坊',
+        };
+
+        // Category color gradients for event tags (match legend colors)
+        const categoryColors = {
+            bd: 'linear-gradient(135deg, #8e44ad, #9b59b6)',
+            bds: 'linear-gradient(135deg, #d2b48c, #a67c52)',
+            hy: 'linear-gradient(135deg, #ff8ab8, #ff5fa2)',
+            or: 'linear-gradient(135deg, #7f8c8d, #95a5a6)',
+            so: 'linear-gradient(135deg, #2ecc71, #27ae60)',
+            sp: 'linear-gradient(135deg, #e74c3c, #c0392b)',
+            ss: 'linear-gradient(135deg, #34495e, #2c3e50)',
+            wk: 'linear-gradient(135deg, #f39c12, #e67e22)',
+        };
+
+        // Current month state
+        let currentMonth = 0; // 預設從第一個月份開始
+        let monthNames = []; // 動態生成月份名稱
+        let monthEvents = []; // 動態月份事件陣列
+
+        // 動態生成月份資料
+        function generateMonthData() {
+            monthNames = [];
+            monthEvents = [];
+            
+            // 從 window 物件中掃描所有類似 'augustEvents' 的變數
+            const allMonthEventVars = Object.keys(window).filter(key => key.endsWith('Events') && typeof window[key] === 'object' && Array.isArray(window[key]));
+            
+            console.log(`✅ 找到 ${allMonthEventVars.length} 個月份變數`);
+
+            // 月份順序對照表
+            const monthOrder = {
+                'january': 1, 'february': 2, 'march': 3, 'april': 4,
+                'may': 5, 'june': 6, 'july': 7, 'august': 8,
+                'september': 9, 'october': 10, 'november': 11, 'december': 12
+            };
+
+            // 根據月份和年份排序
+            allMonthEventVars.sort((a, b) => {
+                const aMonthName = a.replace('Events', '').toLowerCase();
+                const bMonthName = b.replace('Events', '').toLowerCase();
+                
+                const aMonthNum = monthOrder[aMonthName];
+                const bMonthNum = monthOrder[bMonthName];
+
+                // 假設年份在變數名稱中不明確，但我們可以在生成時指定
+                // 目前簡化處理，僅按月份排序
+                return aMonthNum - bMonthNum;
+            });
+
+            allMonthEventVars.forEach(monthVarName => {
+                const monthName = monthVarName.replace('Events', '');
+                // 假設年份是 2025，如果未來需要動態年份，需要從其他地方獲取
+                const year = 2025; 
+                const monthNum = monthOrder[monthName.toLowerCase()];
+                if (monthNum) {
+                    const fullMonthName = `${year}年${monthNum}月`;
+                    monthNames.push(fullMonthName);
+                    monthEvents.push(window[monthVarName]);
+                }
+            });
+        }
+
+        // 獲取當前月份索引
+        function getCurrentMonthIndex() {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth() + 1; // JavaScript months are 0-based
+            
+            // 在月份陣列中尋找對應的月份
+            for (let i = 0; i < monthNames.length; i++) {
+                const monthMatch = monthNames[i].match(/(\d{4})年(\d{1,2})月/);
+                if (monthMatch) {
+                    const year = parseInt(monthMatch[1]);
+                    const month = parseInt(monthMatch[2]);
+                    if (year === currentYear && month === currentMonth) {
+                        return i;
+                    }
+                }
+            }
+            
+            // 如果找不到當前月份，預設顯示第一個月份
+            return 0;
+        }
+
+        function toggleVenue(venueClass) {
+            venueVisibility[venueClass] = !venueVisibility[venueClass];
+            const checkbox = document.getElementById(venueClass + '-checkbox');
+            checkbox.checked = venueVisibility[venueClass];
+            
+            // Regenerate all calendars with updated visibility
+            monthEvents.forEach((events, index) => {
+                const monthMatch = monthNames[index].match(/(\d{4})年(\d{1,2})月/);
+                if (monthMatch) {
+                    const year = parseInt(monthMatch[1]);
+                    const month = parseInt(monthMatch[2]);
+                    const calendarId = `calendar-${year}-${month}`;
+                    generateCalendar(calendarId, events, year, month);
+                }
+            });
+        }
+
+        function toggleCategory(categoryClass) {
+            categoryVisibility[categoryClass] = !categoryVisibility[categoryClass];
+            const checkbox = document.getElementById(categoryClass + '-checkbox');
+            checkbox.checked = categoryVisibility[categoryClass];
+            
+            // Regenerate all calendars with updated visibility
+            monthEvents.forEach((events, index) => {
+                const monthMatch = monthNames[index].match(/(\d{4})年(\d{1,2})月/);
+                if (monthMatch) {
+                    const year = parseInt(monthMatch[1]);
+                    const month = parseInt(monthMatch[2]);
+                    const calendarId = `calendar-${year}-${month}`;
+                    generateCalendar(calendarId, events, year, month);
+                }
+            });
+        }
+
+        function getCurrentDate() {
+            const today = new Date();
+            return {
+                month: today.getMonth() + 1, // JavaScript months are 0-based
+                day: today.getDate()
+            };
+        }
+
+        function isPastDate(day, month) {
+            const today = getCurrentDate();
+            if (month < today.month) return true;
+            if (month === today.month && day < today.day) return true;
+            return false;
+        }
+
+        function toggleUpdateInfo() {
+            const updateInfo = document.getElementById('updateInfo');
+            if (updateInfo.style.display === 'none' || updateInfo.style.display === '') {
+                updateInfo.style.display = 'block';
+            } else {
+                updateInfo.style.display = 'none';
+            }
+        }
+
+        // 僅顯示最新三筆更新，提供展開/收合
+        function setupUpdatesCollapsing() {
+            const list = document.querySelector('.update-list');
+            if (!list) return;
+
+            const items = Array.from(list.querySelectorAll('.update-item'));
+            if (items.length <= 3) {
+                // 不足三筆不顯示按鈕
+                const btn = document.getElementById('updatesToggleBtn');
+                if (btn) btn.style.display = 'none';
+                return;
+            }
+
+            // 初始隱藏第三筆之後的項目
+            for (let i = 3; i < items.length; i++) {
+                items[i].style.display = 'none';
+            }
+
+            const btn = document.getElementById('updatesToggleBtn');
+            if (!btn) return;
+            btn.style.display = 'inline-block';
+
+            let expanded = false;
+            btn.addEventListener('click', function() {
+                expanded = !expanded;
+                for (let i = 3; i < items.length; i++) {
+                    items[i].style.display = expanded ? 'flex' : 'none';
+                }
+                btn.textContent = expanded ? '收合更新資訊' : '更多更新資訊';
+            });
+        }
+
+        // 手機：場地與分類折疊控制
+        function applyLegendCollapseByViewport() {
+            const legend = document.querySelector('.legend');
+            const categoryLegend = document.querySelector('.category-legend');
+            const isMobile = window.innerWidth <= 768;
+            if (legend) {
+                if (isMobile) legend.classList.add('collapsed');
+                else legend.classList.remove('collapsed');
+            }
+            if (categoryLegend) {
+                if (isMobile) categoryLegend.classList.add('collapsed');
+                else categoryLegend.classList.remove('collapsed');
+            }
+        }
+
+        function setupLegendsCollapsible() {
+            const legendContainer = document.querySelector('.legend');
+            const categoryLegendContainer = document.querySelector('.category-legend');
+            const legendTitle = document.querySelector('.legend-title');
+            const categoryLegendTitle = document.querySelector('.category-legend-title');
+
+            if (legendTitle && legendContainer) {
+                legendTitle.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        legendContainer.classList.toggle('collapsed');
+                    }
+                });
+            }
+
+            if (categoryLegendTitle && categoryLegendContainer) {
+                categoryLegendTitle.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        categoryLegendContainer.classList.toggle('collapsed');
+                    }
+                });
+            }
+        }
+
+        function generateCalendar(containerId, events, year, month) {
+            const calendar = document.getElementById(containerId);
+            calendar.innerHTML = '';
+            
+            const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+            
+            // Add day headers
+            daysOfWeek.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = day;
+                calendar.appendChild(dayHeader);
+            });
+
+            // Calculate first day of month and days in month
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            // Add empty cells for previous month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell other-month';
+                calendar.appendChild(emptyCell);
+            }
+
+            // Add days of the month
+            const today = getCurrentDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+                
+                // Check if today
+                if (day === today.day && month === today.month) {
+                    dayCell.classList.add('today');
+                } else if (isPastDate(day, month)) {
+                    dayCell.classList.add('past-day');
+                }
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                dayCell.appendChild(dayNumber);
+
+                // Add events for this day and sort by start time
+                const dayEvents = events.filter(event => {
+                    const hasVenue = venueVisibility[event.class];
+                    
+                    // 如果活動有 category 但不存在於 categoryVisibility 中，自動添加到所有類別定義
+                    if (event.category && categoryVisibility[event.category] === undefined) {
+                        categoryVisibility[event.category] = true;
+                        if (!categoryNames[event.category]) {
+                            categoryNames[event.category] = event.category.toUpperCase();
+                        }
+                        if (!categoryColors[event.category]) {
+                            categoryColors[event.category] = 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
+                        }
+                        console.log(`⚠️ 自動添加新分類: ${event.category} (來自活動: ${event.title})`);
+                    }
+                    
+                    const hasCategory = !event.category || categoryVisibility[event.category];
+                    const showEvent = event.date === day && hasVenue && hasCategory;
+                    return showEvent;
+                });
+                
+                // Sort events by start time
+                dayEvents.sort((a, b) => {
+                    const getStartTime = (timeStr) => {
+                        const normalized = (timeStr || '').replace(/：/g, ':');
+                        const match = normalized.match(/(\d{1,2}):(\d{2})/);
+                        if (match) {
+                            return parseInt(match[1]) * 60 + parseInt(match[2]);
+                        }
+                        return 0;
+                    };
+                    return getStartTime(a.time) - getStartTime(b.time);
+                });
+                
+                dayEvents.forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    const isPast = isPastDate(day, month);
+                    eventDiv.className = `event ${event.class}${isPast ? ' past' : ''}`;
+                    eventDiv.style.position = 'relative';
+                    const neutralChip = `<span class="event-category-chip">${categoryNames[event.category] || '其他'}</span>`;
+                    eventDiv.innerHTML = `
+                        <div class="event-venue">${event.venue} ${neutralChip}</div>
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-time">${event.time}</div>
+                        ${event.link && !isPast ? '<div class="register-icon">🔗</div>' : ''}
+                    `;
+                    
+                    if (!isPast) {
+                        eventDiv.addEventListener('click', () => showEventDetails(event, month));
+                        // 添加觸控回饋
+                        eventDiv.addEventListener('touchstart', function() {
+                            this.style.opacity = '0.7';
+                        });
+                        eventDiv.addEventListener('touchend', function() {
+                            this.style.opacity = '1';
+                        });
+                    }
+                    
+                    dayCell.appendChild(eventDiv);
+                });
+
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        function showEventDetails(event, month) {
+            const modal = document.getElementById('eventModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            const isPast = isPastDate(event.date, month);
+            let linkButton = '';
+            
+            if (event.link) {
+                if (isPast) {
+                    linkButton = `<div class="register-button disabled">
+                        ⌛ 活動已結束
+                    </div>`;
+                } else {
+                    const linkText = event.linkLabel ? event.linkLabel : '前往報名';
+                    linkButton = `<a href="${event.link}" target="_blank" class="register-button">
+                        🔗 ${linkText}
+                    </a>`;
+                }
+            } else if (!isPast) {
+                linkButton = `<div class="register-button pending">
+                    ⏳ 報名表單敬請期待
+                </div>`;
+            }
+            
+            const monthName = String(month);
+            const modalCategoryStyle = categoryColors[event.category] || 'linear-gradient(135deg, #bdc3c7, #95a5a6)';
+            const categoryTag = `<div class="event-category-tag" style="background: ${modalCategoryStyle}">${categoryNames[event.category] || '其他'}</div>`;
+            
+            modalContent.innerHTML = `
+                <h2 style="color: ${isPast ? '#999' : '#2c3e50'}; margin-bottom: 8px; font-size: 1.3rem;">${event.venue}</h2>
+                <h3 style="color: ${isPast ? '#aaa' : '#34495e'}; margin-bottom: 12px; font-size: 1.1rem;">${event.title}${isPast ? ' (已結束)' : ''}</h3>
+                ${categoryTag}
+                <p style="margin-bottom: 6px; font-size: 0.95rem; color: ${isPast ? '#999' : 'inherit'};"><strong>日期：</strong>${monthName}月${event.date}日</p>
+                <p style="margin-bottom: 12px; font-size: 0.95rem; color: ${isPast ? '#999' : 'inherit'};"><strong>時間：</strong>${event.time}</p>
+                ${linkButton}
+            `;
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            
+            // Limit to available months (動態限制)
+            if (currentMonth < 0) currentMonth = 0;
+            if (currentMonth >= monthNames.length) currentMonth = monthNames.length - 1;
+            
+            updateCalendarView();
+        }
+
+        function updateCalendarView() {
+            const slider = document.getElementById('calendarSlider');
+            const monthTitle = document.getElementById('monthTitle');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Update slider position
+            slider.style.transform = `translateX(-${currentMonth * 100}%)`;
+            
+            // Update month title
+            monthTitle.textContent = monthNames[currentMonth];
+            
+            // Update button states
+            prevBtn.disabled = currentMonth === 0;
+            nextBtn.disabled = currentMonth === monthNames.length - 1;
+            
+            // 動態調整日曆容器高度
+            adjustCalendarHeight();
+        }
+
+        function adjustCalendarHeight() {
+            const calendarContainer = document.getElementById('calendarContainer');
+            const calendarSlider = document.querySelector('.calendar-slider');
+            const calendarMonths = document.querySelectorAll('.calendar-month');
+            
+            if (calendarMonths.length > 0) {
+                const isMobile = window.innerWidth <= 768;
+                const isSmallMobile = window.innerWidth <= 480;
+                
+                // 根據螢幕尺寸設定最小高度
+                let minHeight;
+                if (isSmallMobile) {
+                    minHeight = 450;
+                } else if (isMobile) {
+                    minHeight = 500;
+                } else {
+                    minHeight = 600;
+                }
+                
+                // 為每個月份單獨計算和設定高度
+                calendarMonths.forEach((month, index) => {
+                    const calendarGrid = month.querySelector('.calendar-grid');
+                    if (calendarGrid) {
+                        const gridHeight = calendarGrid.scrollHeight;
+                        const monthHeight = Math.max(gridHeight + 20, minHeight);
+                        month.style.minHeight = monthHeight + 'px';
+                    }
+                });
+                
+                // 獲取當前顯示月份的高度
+                const currentMonthElement = calendarMonths[currentMonth];
+                if (currentMonthElement) {
+                    const currentMonthHeight = currentMonthElement.style.minHeight || minHeight + 'px';
+                    const currentHeight = parseInt(currentMonthHeight);
+                    
+                    // 強制設定容器和滑動器的高度為當前月份的高度
+                    calendarContainer.style.minHeight = currentHeight + 'px';
+                    calendarContainer.style.height = currentHeight + 'px';
+                    calendarSlider.style.minHeight = currentHeight + 'px';
+                    calendarSlider.style.height = currentHeight + 'px';
+                } else {
+                    // 如果找不到當前月份，使用最小高度
+                    calendarContainer.style.minHeight = minHeight + 'px';
+                    calendarContainer.style.height = minHeight + 'px';
+                    calendarSlider.style.minHeight = minHeight + 'px';
+                    calendarSlider.style.height = minHeight + 'px';
+                }
+            }
+        }
+
+        // Touch handling for mobile swipe
+        let startX = 0;
+        let startY = 0;
+        let isScrolling = false;
+
+        document.getElementById('calendarContainer').addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isScrolling = false;
+        }, { passive: true });
+
+        document.getElementById('calendarContainer').addEventListener('touchmove', function(e) {
+            if (!isScrolling) {
+                const deltaX = Math.abs(e.touches[0].clientX - startX);
+                const deltaY = Math.abs(e.touches[0].clientY - startY);
+                
+                if (deltaY > deltaX) {
+                    isScrolling = true;
+                } else if (deltaX > 10) {
+                    e.preventDefault();
+                }
+            }
+        }, { passive: false });
+
+        document.getElementById('calendarContainer').addEventListener('touchend', function(e) {
+            if (!isScrolling) {
+                const deltaX = e.changedTouches[0].clientX - startX;
+                
+                if (Math.abs(deltaX) > 50) {
+                    if (deltaX > 0 && currentMonth > 0) {
+                        changeMonth(-1);
+                    } else if (deltaX < 0 && currentMonth < monthNames.length - 1) {
+                        changeMonth(1);
+                    }
+                }
+            }
+        }, { passive: true });
+
+        // Modal close functionality
+        document.querySelector('.close').addEventListener('click', closeModal);
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // 添加觸控支援
+        document.querySelector('.close').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            closeModal();
+        });
+
+        // 防止模態框內容點擊時關閉
+        document.querySelector('.modal-content').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // 主辦方網站連結函數
+        function openVenueWebsite(venue, event) {
+            event.stopPropagation(); // 防止觸發父元素的點擊事件
+            
+            const venueUrls = {
+                'jukuya': 'https://x.com/jukuya456',
+                'toyroom': 'https://studiobondage.com/?fbclid=IwY2xjawMjGPRleHRuA2FlbQIxMABicmlkETFnSVc1dTRqaEY1elhTZTlRAR7xJ86EgSLcXp4AlX15ulnYKMmKIctTZaT7-2H7bh7nmcmKEkoLP1f9dexZ4w_aem_XXSM0oPn7ZBCX0AL4u_dWg',
+                'gengyiroom': 'https://x.com/gengyiroom',
+                'think': 'https://x.com/s9808191779632',
+                'zoo': 'https://x.com/16fnzoo'
+            };
+            
+            const url = venueUrls[venue];
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // 動態更新類別圖例
+        function updateCategoryLegend() {
+            const categoryLegendContainer = document.querySelector('.category-legend-items');
+            if (!categoryLegendContainer) return;
+            
+            // 收集所有已存在的類別
+            const existingCategories = new Set(Object.keys(categoryVisibility));
+            
+            // 掃描所有活動，找出新類別
+            monthEvents.forEach(events => {
+                events.forEach(event => {
+                    if (event.category && !existingCategories.has(event.category)) {
+                        existingCategories.add(event.category);
+                        // 自動添加新類別
+                        categoryVisibility[event.category] = true;
+                        if (!categoryNames[event.category]) {
+                            categoryNames[event.category] = event.category.toUpperCase();
+                        }
+                        if (!categoryColors[event.category]) {
+                            categoryColors[event.category] = 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
+                        }
+                        console.log(`🆕 發現新分類並自動添加: ${event.category}`);
+                    }
+                });
+            });
+            
+            // 重新生成類別圖例
+            categoryLegendContainer.innerHTML = '';
+            Object.keys(categoryVisibility).sort().forEach(categoryCode => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-legend-item';
+                categoryItem.setAttribute('data-category', categoryCode);
+                categoryItem.onclick = () => toggleCategory(categoryCode);
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'category-checkbox';
+                checkbox.id = `${categoryCode}-checkbox`;
+                checkbox.checked = categoryVisibility[categoryCode];
+                checkbox.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleCategory(categoryCode);
+                };
+                
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'category-color';
+                colorDiv.style.background = categoryColors[categoryCode] || 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = categoryNames[categoryCode] || categoryCode.toUpperCase();
+                
+                categoryItem.appendChild(checkbox);
+                categoryItem.appendChild(colorDiv);
+                categoryItem.appendChild(nameSpan);
+                categoryLegendContainer.appendChild(categoryItem);
+            });
+        }
+
+        // 初始化日曆系統
+        function initializeCalendars() {
+            // 動態生成月份資料
+            generateMonthData();
+            
+            // 更新類別圖例（掃描所有活動的類別）
+            updateCategoryLegend();
+            
+            // 動態生成所有日曆容器和內容
+            const calendarSlider = document.getElementById('calendarSlider');
+            
+            if (!calendarSlider) {
+                console.error('❌ 找不到 calendarSlider 元素！');
+                return;
+            }
+            
+            calendarSlider.innerHTML = ''; // 清空現有內容
+            
+            // 為每個月份創建容器並生成日曆
+            monthEvents.forEach((events, index) => {
+                // 從月份名稱中提取年份和月份數字
+                const monthMatch = monthNames[index].match(/(\d{4})年(\d{1,2})月/);
+                if (monthMatch) {
+                    const year = parseInt(monthMatch[1]);
+                    const month = parseInt(monthMatch[2]);
+                    
+                    // 創建月份容器
+                    const monthDiv = document.createElement('div');
+                    monthDiv.className = 'calendar-month';
+                    monthDiv.id = `month-${year}-${month}`;
+                    
+                    // 創建日曆網格容器
+                    const calendarGrid = document.createElement('div');
+                    calendarGrid.className = 'calendar-grid';
+                    calendarGrid.id = `calendar-${year}-${month}`;
+                    
+                    monthDiv.appendChild(calendarGrid);
+                    calendarSlider.appendChild(monthDiv);
+                    
+                    // 生成該月份的日曆
+                    generateCalendar(calendarGrid.id, events, year, month);
+                } else {
+                    console.warn(`⚠️ 無法解析月份名稱: ${monthNames[index]}`);
+                }
+            });
+            
+            // 設定當前月份為當天所在的月份
+            currentMonth = getCurrentMonthIndex();
+            
+            updateCalendarView();
+        }
+
+        // Prevent checkbox from toggling when clicked directly
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.venue-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const venueClass = this.id.replace('-checkbox', '');
+                    toggleVenue(venueClass);
+                });
+            });
+            
+            // 類別複選框的事件綁定在 updateCategoryLegend() 中動態處理
+            
+            // 在 DOM 加載完成後初始化日曆
+            initializeCalendars();
+        });
+        
+        // 確保日曆生成後立即調整高度
+        setTimeout(adjustCalendarHeight, 100);
+        setTimeout(adjustCalendarHeight, 500);
+
+        // 優化觸控體驗
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+        }
+
+        // 監聽視窗大小改變，重新調整日曆高度
+        window.addEventListener('resize', function() {
+            applyLegendCollapseByViewport();
+            setTimeout(adjustCalendarHeight, 100);
+        });
+
+        // 頁面載入完成後調整高度
+        window.addEventListener('load', function() {
+            setTimeout(adjustCalendarHeight, 200);
+        });
+
+        // =====================
+        // 萬聖節幽靈裝飾（全螢幕亂移動＋淡入淡出）
+        // =====================
+        function createHalloweenDecorations() {
+            const decorationsContainer = document.getElementById('halloweenDecorations');
+            if (!decorationsContainer) return;
+
+            // 清空
+            decorationsContainer.innerHTML = '';
+
+            const decorations = [
+                { emoji: '👻', class: 'ghost', count: 5 }
+            ];
+
+            decorations.forEach(decoration => {
+                for (let i = 0; i < decoration.count; i++) {
+                    const element = document.createElement('div');
+                    element.className = `halloween-decoration ${decoration.class}`;
+                    element.textContent = decoration.emoji;
+
+                    // 隨機初始位置與延遲
+                    element.style.top = Math.random() * 80 + 10 + '%';
+                    element.style.left = Math.random() * 80 + 10 + '%';
+                    element.style.animationDelay = (Math.random() * 2) + 's';
+
+                    decorationsContainer.appendChild(element);
+                }
+            });
+
+            function moveGhostsRandomly() {
+                const ghosts = decorationsContainer.querySelectorAll('.ghost');
+                ghosts.forEach((g) => {
+                    const toX = Math.random() * 100; // vw
+                    const toY = Math.random() * 100; // vh
+                    const scale = 0.8 + Math.random() * 0.6;
+                    const rotate = (Math.random() * 20 - 10);
+                    const duration = 4 + Math.random() * 4; // 4~8s
+
+                    g.style.transitionDuration = duration + 's, ' + Math.max(2, duration - 1) + 's';
+                    g.style.opacity = Math.random() > 0.5 ? 0.9 : 0.5;
+                    g.style.transform = `translate(${toX}vw, ${toY}vh) scale(${scale}) rotate(${rotate}deg)`;
+                });
+            }
+
+            moveGhostsRandomly();
+            setInterval(moveGhostsRandomly, 5000);
+        }
+
+        function checkForHalloweenDecorations() {
+            const today = new Date();
+            const currentMonth = today.getMonth() + 1;
+            if (currentMonth === 10) {
+                createHalloweenDecorations();
+            }
+        }
+    </script>
+</body>
+</html>
+            

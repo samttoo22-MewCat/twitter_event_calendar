@@ -200,7 +200,7 @@ class XCrawler:
         print(f"🐦 Scraping tweets from user @{username}, targeting {num_tweets} tweets.")
         tweets_data = []
         processed_links = set()
-        bottom_check_count = 0  # 用於追蹤連續檢測到底部的次數
+        bottom_check_count = 0  # Counter to track consecutive bottom detections
 
         try:
             self.driver.get(f"https://x.com/{username}")
@@ -283,16 +283,16 @@ class XCrawler:
                 # If the page height has not increased after scrolling, check multiple times to confirm bottom
                 if new_height == last_height:
                     bottom_check_count += 1
-                    print(f"🔍 檢測到可能的底部 ({bottom_check_count}/5)")
+                    print(f"🔍 Potential bottom detected ({bottom_check_count}/5)")
                     
                     if bottom_check_count >= 5:
-                        print("📄 已連續5次確認到達底部，結束爬取。")
+                        print("📄 Bottom confirmed after 5 consecutive checks, ending scrape.")
                         break
                     
-                    # 等待0.2秒後重新檢查
+                    # Wait 0.2 seconds before rechecking
                     time.sleep(0.2)
                 else:
-                    # 高度有變化，重置計數器
+                    # Height changed, reset counter
                     bottom_check_count = 0
                     last_height = new_height
 
@@ -399,7 +399,7 @@ class XCrawler:
         if self.driver:
             try:
                 self.driver.quit()
-                self.driver = None  # 設為 None 避免重複關閉
+                self.driver = None  # Set to None to avoid repeated closing
                 print("✅ Browser closed successfully.")
             except Exception as e:
                 print(f"❌ Error while closing the browser: {e}")
@@ -415,10 +415,10 @@ class XCrawler:
 
     def __del__(self):
         """Destructor to ensure resources are released."""
-        # 只在 driver 還存在時才關閉
+        # Only close if driver still exists
         if hasattr(self, 'driver') and self.driver is not None:
             try:
                 self.close()
             except Exception:
-                # 在析構函數中忽略錯誤，避免在程序退出時產生問題
+                # Ignore errors in destructor to avoid issues during program exit
                 pass
