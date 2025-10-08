@@ -303,10 +303,6 @@ class EventCrawlerUI(tk.Tk):
         self.manage_styles_button = ttk.Button(button_frame, text="管理網站風格", command=self._manage_styles_popup)
         self.manage_styles_button.grid(row=3, column=2, columnspan=2, sticky=tk.EW, padx=2, pady=2)
 
-        # 測試玩具間爬蟲按鈕
-        self.test_sb_crawler_button = ttk.Button(button_frame, text="測試玩具間爬蟲 (Debug)", command=self.test_sb_crawler)
-        self.test_sb_crawler_button.grid(row=4, column=0, columnspan=4, sticky=tk.EW, padx=2, pady=2)
-
         # 事件列表區塊 - 改為 Notebook
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=10, pady=5)
@@ -505,12 +501,8 @@ class EventCrawlerUI(tk.Tk):
             print(f"爬蟲執行錯誤: {e}")
             traceback.print_exc()
     
-    def _fetch_sb_events(self, debug=False):
-        """爬取 SB 玩具間活動（使用當前 UI 的 driver）
-        
-        Args:
-            debug: 是否啟用詳細 debug 輸出
-        """
+    def _fetch_sb_events(self):
+        """爬取 SB 玩具間活動（使用當前 UI 的 driver）"""
         try:
             print("⏳ 正在爬取 SB 玩具間活動...")
             
@@ -518,7 +510,7 @@ class EventCrawlerUI(tk.Tk):
             sb_crawler = SBCrawler(driver=self.crawler.driver)
             
             # 爬取活動
-            events = sb_crawler.scrape_events(debug=debug)
+            events = sb_crawler.scrape_events()
             
             if events:
                 # 儲存活動（自動合併現有資料）
@@ -533,25 +525,6 @@ class EventCrawlerUI(tk.Tk):
             print(f"❌ 爬取 SB 玩具間活動時出錯: {e}")
             traceback.print_exc()
             # 不要中斷整個爬蟲流程，只是記錄錯誤
-    
-    def test_sb_crawler(self):
-        """測試 SB 玩具間爬蟲（帶 debug 輸出）"""
-        print("🧪 測試 SB 玩具間爬蟲...")
-        messagebox.showinfo("測試", "開始測試 SB 玩具間爬蟲（請查看終端機輸出）")
-        
-        def run_test():
-            try:
-                self._fetch_sb_events(debug=True)
-                self.after(0, lambda: messagebox.showinfo("測試完成", "SB 玩具間爬蟲測試完成，請查看終端機輸出"))
-                self.after(0, self._load_events_and_display)  # 重新載入顯示
-            except Exception as e:
-                error_msg = f"測試失敗: {e}"
-                print(error_msg)
-                traceback.print_exc()
-                self.after(0, lambda: messagebox.showerror("測試錯誤", error_msg))
-        
-        # 在背景執行測試
-        threading.Thread(target=run_test, daemon=True).start()
             
     def _load_events_and_display(self):
         outputs_dir = './outputs'

@@ -387,10 +387,10 @@ def main():
             crawler.save_events(events)
             print(f"\n📊 總共爬取了 {len(events)} 個活動")
             
-            # 顯示前幾個活動
-            print("\n🔍 活動預覽（前 3 個）:")
-            for event in events[:3]:
-                print(f"  - {event['date']} {event['title']}")
+            # 顯示活動列表
+            print("\n🔍 活動列表:")
+            for event in events:
+                print(f"  - {event['date']} {event['title']} ({event['start_time']}~{event['end_time']})")
         else:
             print("⚠️ 沒有爬取到任何活動")
             
