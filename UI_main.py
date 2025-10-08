@@ -196,7 +196,7 @@ class EventCrawlerUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("X 爬蟲事件管理")
-        self.geometry("900x700") # 調整視窗大小以容納更多內容
+        self.geometry("900x750") # 調整視窗大小以容納更多內容
 
         self.crawler_interval_hours = tk.DoubleVar(value=6.0) # 預設每6小時執行一次
         self.running_crawler_thread = None
@@ -220,11 +220,30 @@ class EventCrawlerUI(tk.Tk):
         # 初始化 XCrawler 實例
         self.crawler = XCrawler(user_data_dir="profile1", locale_code='zh-TW')
 
+        self._load_or_create_user_config() # 確保使用者設定檔存在
         self._create_widgets()
         self._load_events_and_display()
         
         # 綁定窗口關閉事件
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def _load_or_create_user_config(self):
+        self.user_config_path = 'user_config.json'
+        if not os.path.exists(self.user_config_path):
+            print("user_config.json not found, creating a default one.")
+            default_user_configs = [
+                {'user_id': 'jukuya456', 'name': '拘久屋'},
+                {'user_id': 'studiobondage', 'name': '玩具間'},
+                {'user_id': 'gengyiroom', 'name': '更衣間'},
+                {'user_id': 's9808191779632', 'name': '思'},
+                {'user_id': '16fnzoo', 'name': '動物方程式'},
+            ]
+            try:
+                with open(self.user_config_path, 'w', encoding='utf-8') as f:
+                    json.dump(default_user_configs, f, ensure_ascii=False, indent=4)
+            except Exception as e:
+                print(f"Failed to create default user_config.json: {e}")
+                traceback.print_exc()
 
     def _create_widgets(self):
         # 登入區塊
@@ -275,9 +294,9 @@ class EventCrawlerUI(tk.Tk):
         
         self.manage_categories_button = ttk.Button(button_frame, text="管理類別", command=self._manage_categories_popup)
         self.manage_categories_button.grid(row=2, column=2, columnspan=2, sticky=tk.EW, padx=2, pady=2)
-        
-        self.manage_styles_button = ttk.Button(button_frame, text="管理風格", command=self._manage_styles_popup)
-        self.manage_styles_button.grid(row=3, column=0, columnspan=4, sticky=tk.EW, padx=2, pady=2)
+
+        self.manage_users_button = ttk.Button(button_frame, text="管理爬取帳號", command=self._manage_users_popup)
+        self.manage_users_button.grid(row=3, column=0, columnspan=4, sticky=tk.EW, padx=2, pady=2)
 
         # 事件列表區塊 - 改為 Notebook
         self.notebook = ttk.Notebook(self)
@@ -307,23 +326,26 @@ class EventCrawlerUI(tk.Tk):
 
     def _manual_login_worker(self):
         try:
-            # Disable button while logging in
-            self.after(0, lambda: self.manual_login_button.config(state=tk.DISABLED, text="登入中..."))
+            # Disable button while opening X
+            self.after(0, lambda: self.manual_login_button.config(state=tk.DISABLED, text="開啟中..."))
             
-            # 使用 XCrawler 的登入方法
+            # 使用 XCrawler 的登入方法（只會開啟 x.com）
             if self.crawler.login_to_x():
+                # 彈窗提醒用戶先完成登入
+                self.after(0, lambda: messagebox.showinfo("請先登入", 
+                    "已開啟 X.com，請在瀏覽器中完成登入。\n\n登入完成後，關閉此訊息即可開始使用爬蟲功能。\n\n之後將不需要再次登入，Cookie 會被保存。"))
+                
                 self.is_logged_in = True
                 
-                # Update UI on the main thread after login
-                self.after(0, lambda: messagebox.showinfo("登入成功", "手動登入成功！現在可以開始爬蟲了。"))
+                # Update UI on the main thread after user confirms
                 self.after(0, lambda: self._set_crawler_and_edit_state(True))
                 self.after(0, lambda: self.manual_login_button.config(text="已登入"))
             else:
-                raise Exception("登入失敗")
+                raise Exception("開啟 X.com 失敗")
 
         except Exception as e:
             self.is_logged_in = False
-            self.after(0, lambda: messagebox.showerror("登入失敗", f"手動登入時發生錯誤: {e}"))
+            self.after(0, lambda: messagebox.showerror("登入失敗", f"開啟 X.com 時發生錯誤: {e}"))
             self.after(0, lambda: self.manual_login_button.config(state=tk.NORMAL, text="手動登入 X"))
             print(f"登入錯誤: {e}")
             traceback.print_exc()
@@ -367,13 +389,22 @@ class EventCrawlerUI(tk.Tk):
 
     def _fetch_and_process_events(self):
         self.after(0, lambda: messagebox.showinfo("爬蟲", "開始執行爬蟲..."))
-        user_configs = [
-            {'user_id': 'jukuya456', 'name': '拘久屋'},
-            {'user_id': 'studiobondage', 'name': '玩具間'},
-            {'user_id': 'gengyiroom', 'name': '更衣間'},
-            {'user_id': 's9808191779632', 'name': '思'},
-            {'user_id': '16fnzoo', 'name': '動物方程式'},
-        ]
+        
+        # 從設定檔載入使用者列表
+        user_configs = []
+        try:
+            with open('user_config.json', 'r', encoding='utf-8') as f:
+                user_configs = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            self.after(0, lambda: messagebox.showerror("設定錯誤", f"無法載入 user_config.json: {e}\n請透過'管理爬取帳號'功能設定。"))
+            print(f"Error loading user_config.json: {e}")
+            traceback.print_exc()
+            return
+
+        if not user_configs:
+            self.after(0, lambda: messagebox.showwarning("設定錯誤", "爬取列表為空，請先新增帳號。"))
+            return
+
         num_tweets_to_get = self.num_tweets_to_scrape.get()
         taipei_tz = pytz.timezone('Asia/Taipei')
         today = datetime.now(taipei_tz)
@@ -1545,331 +1576,179 @@ class EventCrawlerUI(tk.Tk):
         ttk.Button(button_frame, text="🔄 重新整理", command=refresh_tree).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="關閉", command=popup.destroy).pack(side=tk.RIGHT, padx=5)
 
-    def _manage_styles_popup(self):
-        """管理網站風格的彈出視窗"""
+    def _manage_users_popup(self):
+        """管理爬取帳號的彈出視窗"""
         popup = tk.Toplevel(self)
-        popup.title("管理網站風格")
-        popup.geometry("800x700")
+        popup.title("管理爬取帳號")
+        popup.geometry("700x600")
         
         main_frame = ttk.Frame(popup, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
         
-        ttk.Label(main_frame, text="網站風格管理", font=('Arial', 14, 'bold')).pack(pady=5)
+        ttk.Label(main_frame, text="爬取帳號管理", font=('Arial', 14, 'bold')).pack(pady=5)
         
-        # 風格清單
-        list_frame = ttk.LabelFrame(main_frame, text="已保存的風格", padding="10")
+        list_frame = ttk.LabelFrame(main_frame, text="目前帳號", padding="10")
         list_frame.pack(fill=tk.BOTH, expand=True, pady=5)
         
-        # 使用 Treeview 顯示風格
         tree_frame = ttk.Frame(list_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True)
         
-        tree = ttk.Treeview(tree_frame, columns=("名稱", "描述"), show="headings", height=10)
-        tree.heading("名稱", text="風格名稱")
-        tree.heading("描述", text="風格描述")
-        tree.column("名稱", width=200)
-        tree.column("描述", width=500)
+        tree = ttk.Treeview(tree_frame, columns=("user_id", "name"), show="headings", height=10)
+        tree.heading("user_id", text="使用者 ID (@後面)")
+        tree.heading("name", text="顯示名稱 (場地)")
+        tree.column("user_id", width=200)
+        tree.column("name", width=200)
         
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scrollbar.set)
         
         tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        # 預覽框
-        preview_frame = ttk.LabelFrame(main_frame, text="風格預覽", padding="10")
-        preview_frame.pack(fill=tk.BOTH, expand=True, pady=5)
-        
-        preview_text = tk.Text(preview_frame, height=8, wrap=tk.WORD, state=tk.DISABLED)
-        preview_text.pack(fill=tk.BOTH, expand=True)
-        
-        # 初始化風格配置目錄
-        style_config_dir = './style_config'
-        os.makedirs(style_config_dir, exist_ok=True)
-        
-        def load_styles():
-            """載入所有風格配置"""
-            styles = {}
-            if os.path.exists(style_config_dir):
-                for filename in os.listdir(style_config_dir):
-                    if filename.endswith('_style.json'):
-                        filepath = os.path.join(style_config_dir, filename)
-                        try:
-                            with open(filepath, 'r', encoding='utf-8') as f:
-                                style_data = json.load(f)
-                                style_name = filename.replace('_style.json', '')
-                                styles[style_name] = style_data
-                        except Exception as e:
-                            print(f"載入風格 {filename} 時發生錯誤: {e}")
-                            traceback.print_exc()
-            return styles
-        
-        def save_style(style_name, style_data):
-            """保存風格配置"""
-            filename = f"{style_name}_style.json"
-            filepath = os.path.join(style_config_dir, filename)
+
+        config_path = 'user_config.json'
+
+        def load_users():
+            if not os.path.exists(config_path):
+                return []
             try:
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    json.dump(style_data, f, ensure_ascii=False, indent=4)
-                return True
-            except Exception as e:
-                print(f"保存風格時發生錯誤: {e}")
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, FileNotFoundError) as e:
+                print(f"Error loading user config: {e}")
                 traceback.print_exc()
-                return False
-        
+                return []
+
+        def save_users(users):
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(users, f, ensure_ascii=False, indent=4)
+
         def refresh_tree():
-            """刷新風格列表"""
             for item in tree.get_children():
                 tree.delete(item)
             
-            styles = load_styles()
-            for style_name in sorted(styles.keys()):
-                style_data = styles[style_name]
-                description = style_data.get('description', '無描述')
-                tree.insert("", "end", values=(style_name, description), iid=style_name)
+            users = load_users()
+            for user in users:
+                tree.insert("", "end", values=(user['user_id'], user['name']))
+
+        def add_user():
+            add_popup = tk.Toplevel(popup)
+            add_popup.title("新增帳號")
+            add_popup.geometry("400x150")
+            
+            frame = ttk.Frame(add_popup, padding="20")
+            frame.pack(fill=tk.BOTH, expand=True)
+            
+            ttk.Label(frame, text="使用者 ID:").grid(row=0, column=0, sticky=tk.W, pady=5)
+            user_id_entry = ttk.Entry(frame, width=30)
+            user_id_entry.grid(row=0, column=1, pady=5, sticky=tk.EW)
+            
+            ttk.Label(frame, text="顯示名稱:").grid(row=1, column=0, sticky=tk.W, pady=5)
+            name_entry = ttk.Entry(frame, width=30)
+            name_entry.grid(row=1, column=1, pady=5, sticky=tk.EW)
+            
+            frame.columnconfigure(1, weight=1)
+
+            def save_new_user():
+                user_id = user_id_entry.get().strip()
+                name = name_entry.get().strip()
+
+                if not user_id or not name:
+                    messagebox.showwarning("輸入錯誤", "ID 和名稱不能為空！", parent=add_popup)
+                    return
+                
+                users = load_users()
+                if any(u['user_id'] == user_id for u in users):
+                    messagebox.showwarning("重複", f"使用者 ID '{user_id}' 已存在！", parent=add_popup)
+                    return
+                
+                users.append({'user_id': user_id, 'name': name})
+                save_users(users)
+                refresh_tree()
+                add_popup.destroy()
+                messagebox.showinfo("成功", f"已新增帳號 '{user_id}'")
+
+            ttk.Button(frame, text="保存", command=save_new_user).grid(row=2, column=0, columnspan=2, pady=10)
         
-        def on_style_select(event):
-            """當選擇風格時顯示預覽"""
+        def edit_user():
             selected = tree.selection()
             if not selected:
+                messagebox.showwarning("提示", "請選擇要編輯的帳號！")
                 return
+
+            item_values = tree.item(selected[0], 'values')
+            old_user_id = item_values[0]
+            old_name = item_values[1]
+
+            edit_popup = tk.Toplevel(popup)
+            edit_popup.title(f"編輯帳號 - {old_user_id}")
+            edit_popup.geometry("400x150")
+
+            frame = ttk.Frame(edit_popup, padding="20")
+            frame.pack(fill=tk.BOTH, expand=True)
+
+            ttk.Label(frame, text="使用者 ID:").grid(row=0, column=0, sticky=tk.W, pady=5)
+            user_id_entry = ttk.Entry(frame, width=30)
+            user_id_entry.insert(0, old_user_id)
+            user_id_entry.grid(row=0, column=1, pady=5, sticky=tk.EW)
+
+            ttk.Label(frame, text="顯示名稱:").grid(row=1, column=0, sticky=tk.W, pady=5)
+            name_entry = ttk.Entry(frame, width=30)
+            name_entry.insert(0, old_name)
+            name_entry.grid(row=1, column=1, pady=5, sticky=tk.EW)
+
+            frame.columnconfigure(1, weight=1)
+
+            def save_edit():
+                new_user_id = user_id_entry.get().strip()
+                new_name = name_entry.get().strip()
+
+                if not new_user_id or not new_name:
+                    messagebox.showwarning("輸入錯誤", "ID 和名稱不能為空！", parent=edit_popup)
+                    return
+
+                users = load_users()
+                if new_user_id != old_user_id and any(u['user_id'] == new_user_id for u in users):
+                    messagebox.showwarning("重複", f"使用者 ID '{new_user_id}' 已存在！", parent=edit_popup)
+                    return
+                
+                for i, user in enumerate(users):
+                    if user['user_id'] == old_user_id:
+                        users[i] = {'user_id': new_user_id, 'name': new_name}
+                        break
+                
+                save_users(users)
+                refresh_tree()
+                edit_popup.destroy()
+                messagebox.showinfo("成功", f"已更新帳號 '{new_user_id}'")
             
-            style_name = selected[0]
-            styles = load_styles()
-            if style_name in styles:
-                style_data = styles[style_name]
-                
-                preview_text.config(state=tk.NORMAL)
-                preview_text.delete(1.0, tk.END)
-                
-                # 顯示風格資訊
-                preview_content = f"風格名稱: {style_name}\n"
-                preview_content += f"描述: {style_data.get('description', '無描述')}\n\n"
-                preview_content += "主要配色:\n"
-                preview_content += f"  • Body 背景: {style_data.get('body_background', 'N/A')[:60]}...\n"
-                preview_content += f"  • Container 背景: {style_data.get('container_background', 'N/A')[:60]}...\n"
-                preview_content += f"  • Header 背景: {style_data.get('header_background', 'N/A')[:60]}...\n"
-                preview_content += f"  • 邊框顏色: {style_data.get('border_color', 'N/A')}\n"
-                
-                preview_text.insert(1.0, preview_content)
-                preview_text.config(state=tk.DISABLED)
-        
-        tree.bind('<<TreeviewSelect>>', on_style_select)
-        
-        def apply_style_to_html():
-            """將選中的風格應用到 HTML 檔案"""
+            ttk.Button(frame, text="保存", command=save_edit).grid(row=2, column=0, columnspan=2, pady=10)
+
+        def delete_user():
             selected = tree.selection()
             if not selected:
-                messagebox.showwarning("提示", "請先選擇要應用的風格！")
+                messagebox.showwarning("提示", "請選擇要刪除的帳號！")
                 return
             
-            style_name = selected[0]
+            user_id = tree.item(selected[0], 'values')[0]
             
-            # 讓用戶選擇要應用的 HTML 檔案
-            html_filepath = filedialog.askopenfilename(
-                title="選擇要應用風格的 HTML 檔案",
-                filetypes=[("HTML 檔案", "*.html"), ("所有檔案", "*.*")],
-                initialdir="."
-            )
-            if not html_filepath:
-                return
-            
-            styles = load_styles()
-            if style_name not in styles:
-                messagebox.showerror("錯誤", "找不到該風格配置！")
-                return
-            
-            style_data = styles[style_name]
-            
-            try:
-                with open(html_filepath, 'r', encoding='utf-8') as f:
-                    html_content = f.read()
-                
-                # 替換 CSS 樣式 - 使用 lambda 函數避免組引用錯誤
-                
-                # 1. Body background (多行)
-                if 'body_background' in style_data:
-                    html_content = re.sub(
-                        r'(body\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["body_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 2. Body::before background-image (多行)
-                if 'body_before_background' in style_data:
-                    html_content = re.sub(
-                        r'(body::before\s*\{[^}]*?background-image:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["body_before_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 3. Container background (多行)
-                if 'container_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.container\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["container_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 4. Container box-shadow
-                if 'container_box_shadow' in style_data:
-                    html_content = re.sub(
-                        r'(\.container\s*\{[^}]*?box-shadow:\s*)[^;]+;',
-                        lambda m: f'{m.group(1)}{style_data["container_box_shadow"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 5. Container border
-                if 'border_color' in style_data:
-                    html_content = re.sub(
-                        r'(\.container\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
-                        lambda m: f'{m.group(1)}{style_data["border_color"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 6. Header background (多行)
-                if 'header_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.header\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["header_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 7. Header::before background-image (多行)
-                if 'header_before_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.header::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["header_before_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 8. Day-header background (多行)
-                if 'day_header_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.day-header\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["day_header_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 9. Day-header::before background-image (多行)
-                if 'day_header_before_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.day-header::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["day_header_before_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 10. Day-cell background (多行)
-                if 'day_cell_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.day-cell\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["day_cell_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 11. Day-cell border
-                if 'day_cell_border' in style_data:
-                    html_content = re.sub(
-                        r'(\.day-cell\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
-                        lambda m: f'{m.group(1)}{style_data["day_cell_border"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 12. Day-cell::before background-image (多行)
-                if 'day_cell_before_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.day-cell::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
-                        lambda m: f'{m.group(1)}\n                {style_data["day_cell_before_background"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 13. Today background (當日日期的背景 - 多行)
-                if 'today_background' in style_data:
-                    html_content = re.sub(
-                        r'(\.today\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^!]+!important;',
-                        lambda m: f'{m.group(1)}\n                {style_data["today_background"]} !important;',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 14. Today border (當日日期的邊框)
-                if 'today_border' in style_data:
-                    html_content = re.sub(
-                        r'(\.today\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
-                        lambda m: f'{m.group(1)}{style_data["today_border"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                # 15. Today box-shadow (當日日期的陰影)
-                if 'today_box_shadow' in style_data:
-                    html_content = re.sub(
-                        r'(\.today\s*\{[^}]*?box-shadow:\s*)[^;]+;',
-                        lambda m: f'{m.group(1)}{style_data["today_box_shadow"]};',
-                        html_content,
-                        flags=re.DOTALL
-                    )
-                
-                with open(html_filepath, 'w', encoding='utf-8') as f:
-                    f.write(html_content)
-                
-                messagebox.showinfo("成功", f"已成功將「{style_name}」風格應用到 HTML 檔案！\n\n已更新的樣式元素：\n• Body 背景\n• Container 背景與邊框\n• Header 背景\n• 日期標題背景\n• 日期單元格背景與邊框\n• 當日日期強調樣式")
-            
-            except Exception as e:
-                messagebox.showerror("錯誤", f"應用風格時發生錯誤: {e}\n\n請檢查風格配置檔案格式是否正確。")
-                print(f"應用風格錯誤: {e}")
-                traceback.print_exc()
+            if messagebox.askyesno("確認刪除", f"確定要刪除帳號 '{user_id}' 嗎？"):
+                users = load_users()
+                users = [user for user in users if user['user_id'] != user_id]
+                save_users(users)
+                refresh_tree()
+                messagebox.showinfo("成功", f"已刪除帳號 '{user_id}'")
         
-        def delete_style():
-            """刪除選中的風格"""
-            selected = tree.selection()
-            if not selected:
-                messagebox.showwarning("提示", "請選擇要刪除的風格！")
-                return
-            
-            style_name = selected[0]
-            
-            if messagebox.askyesno("確認刪除", f"確定要刪除風格「{style_name}」嗎？"):
-                filename = f"{style_name}_style.json"
-                filepath = os.path.join(style_config_dir, filename)
-                try:
-                    if os.path.exists(filepath):
-                        os.remove(filepath)
-                        messagebox.showinfo("成功", f"已刪除風格「{style_name}」")
-                        refresh_tree()
-                        preview_text.config(state=tk.NORMAL)
-                        preview_text.delete(1.0, tk.END)
-                        preview_text.config(state=tk.DISABLED)
-                except Exception as e:
-                    messagebox.showerror("錯誤", f"刪除風格時發生錯誤: {e}")
-                    traceback.print_exc()
+        tree.bind('<Double-1>', lambda e: edit_user())
         
-        # 雙擊預覽
-        tree.bind('<Double-1>', lambda e: on_style_select(e))
+        refresh_tree()
         
-        # 按鈕區
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill=tk.X, pady=10)
         
-        ttk.Button(button_frame, text="✅ 應用風格到 HTML", command=apply_style_to_html).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="🗑️ 刪除選中", command=delete_style).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="🔄 重新整理", command=refresh_tree).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="➕ 新增帳號", command=add_user).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="✏️ 編輯選中", command=edit_user).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="🗑️ 刪除選中", command=delete_user).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="關閉", command=popup.destroy).pack(side=tk.RIGHT, padx=5)
-        
-        # 初始化列表
-        refresh_tree()
 
     def on_closing(self):
         self.stop_crawler()
