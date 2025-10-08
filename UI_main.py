@@ -296,7 +296,10 @@ class EventCrawlerUI(tk.Tk):
         self.manage_categories_button.grid(row=2, column=2, columnspan=2, sticky=tk.EW, padx=2, pady=2)
 
         self.manage_users_button = ttk.Button(button_frame, text="管理爬取帳號", command=self._manage_users_popup)
-        self.manage_users_button.grid(row=3, column=0, columnspan=4, sticky=tk.EW, padx=2, pady=2)
+        self.manage_users_button.grid(row=3, column=0, columnspan=2, sticky=tk.EW, padx=2, pady=2)
+
+        self.manage_styles_button = ttk.Button(button_frame, text="管理網站風格", command=self._manage_styles_popup)
+        self.manage_styles_button.grid(row=3, column=2, columnspan=2, sticky=tk.EW, padx=2, pady=2)
 
         # 事件列表區塊 - 改為 Notebook
         self.notebook = ttk.Notebook(self)
@@ -331,13 +334,10 @@ class EventCrawlerUI(tk.Tk):
             
             # 使用 XCrawler 的登入方法（只會開啟 x.com）
             if self.crawler.login_to_x():
-                # 彈窗提醒用戶先完成登入
-                self.after(0, lambda: messagebox.showinfo("請先登入", 
-                    "已開啟 X.com，請在瀏覽器中完成登入。\n\n登入完成後，關閉此訊息即可開始使用爬蟲功能。\n\n之後將不需要再次登入，Cookie 會被保存。"))
-                
+                # 登入成功後不再彈出提示，直接更新狀態
                 self.is_logged_in = True
                 
-                # Update UI on the main thread after user confirms
+                # Update UI on the main thread
                 self.after(0, lambda: self._set_crawler_and_edit_state(True))
                 self.after(0, lambda: self.manual_login_button.config(text="已登入"))
             else:
@@ -345,39 +345,50 @@ class EventCrawlerUI(tk.Tk):
 
         except Exception as e:
             self.is_logged_in = False
-            self.after(0, lambda: messagebox.showerror("登入失敗", f"開啟 X.com 時發生錯誤: {e}"))
+            error_message = f"開啟 X.com 時發生錯誤: {e}"
+            print(f"登入失敗: {error_message}")
+            self.after(0, lambda: messagebox.showerror("登入失敗", error_message))
             self.after(0, lambda: self.manual_login_button.config(state=tk.NORMAL, text="手動登入 X"))
             print(f"登入錯誤: {e}")
             traceback.print_exc()
 
     def start_crawler(self):
         if not self.is_logged_in:
+            print("爬蟲警告: 請先登入 X！")
             messagebox.showwarning("爬蟲", "請先登入 X！")
             return
         if self.running_crawler_thread and self.running_crawler_thread.is_alive():
+            print("爬蟲提示: 爬蟲正在運行中。")
             messagebox.showinfo("爬蟲", "爬蟲正在運行中。")
             return
         
         self.stop_crawler_event.clear()
         self.running_crawler_thread = threading.Thread(target=self._run_crawler_periodically, daemon=True)
         self.running_crawler_thread.start()
-        messagebox.showinfo("爬蟲", f"爬蟲已啟動，每 {self.crawler_interval_hours.get()} 小時執行一次。")
+        info_message = f"爬蟲已啟動，每 {self.crawler_interval_hours.get()} 小時執行一次。"
+        print(f"爬蟲提示: {info_message}")
+        messagebox.showinfo("爬蟲", info_message)
 
     def run_crawler_once(self):
         if not self.is_logged_in:
+            print("爬蟲警告: 請先登入 X！")
             messagebox.showwarning("爬蟲", "請先登入 X！")
             return
         if self.running_crawler_thread and self.running_crawler_thread.is_alive():
+            print("爬蟲警告: 爬蟲正在運行中，請先停止自動爬蟲或等待其完成。")
             messagebox.showwarning("爬蟲", "爬蟲正在運行中，請先停止自動爬蟲或等待其完成。")
             return
+        print("爬蟲提示: 手動執行請求已收到，即將在背景開始執行。")
         messagebox.showinfo("爬蟲", "手動執行請求已收到，即將在背景開始執行。")
         threading.Thread(target=self._fetch_and_process_events, daemon=True).start()
 
     def stop_crawler(self):
         if self.running_crawler_thread and self.running_crawler_thread.is_alive():
             self.stop_crawler_event.set()
+            print("爬蟲提示: 爬蟲已發出停止訊號，將在當前週期結束後停止。")
             messagebox.showinfo("爬蟲", "爬蟲已發出停止訊號，將在當前週期結束後停止。")
         else:
+            print("爬蟲提示: 爬蟲未運行。")
             messagebox.showinfo("爬蟲", "爬蟲未運行。")
 
     def _run_crawler_periodically(self):
@@ -388,6 +399,7 @@ class EventCrawlerUI(tk.Tk):
             self.stop_crawler_event.wait(sleep_seconds)
 
     def _fetch_and_process_events(self):
+        print("爬蟲提示: 開始執行爬蟲...")
         self.after(0, lambda: messagebox.showinfo("爬蟲", "開始執行爬蟲..."))
         
         # 從設定檔載入使用者列表
@@ -396,12 +408,15 @@ class EventCrawlerUI(tk.Tk):
             with open('user_config.json', 'r', encoding='utf-8') as f:
                 user_configs = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            self.after(0, lambda: messagebox.showerror("設定錯誤", f"無法載入 user_config.json: {e}\n請透過'管理爬取帳號'功能設定。"))
+            error_message = f"無法載入 user_config.json: {e}\n請透過'管理爬取帳號'功能設定。"
+            print(f"設定錯誤: {error_message}")
+            self.after(0, lambda: messagebox.showerror("設定錯誤", error_message))
             print(f"Error loading user_config.json: {e}")
             traceback.print_exc()
             return
 
         if not user_configs:
+            print("設定錯誤: 爬取列表為空，請先新增帳號。")
             self.after(0, lambda: messagebox.showwarning("設定錯誤", "爬取列表為空，請先新增帳號。"))
             return
 
@@ -470,10 +485,13 @@ class EventCrawlerUI(tk.Tk):
                 with open(json_filename, 'w', encoding='utf-8') as f:
                     json.dump(final_events, f, ensure_ascii=False, indent=4)
 
+            print("爬蟲提示: 爬蟲執行完成，更新活動列表。")
             self.after(0, lambda: messagebox.showinfo("爬蟲", "爬蟲執行完成，更新活動列表。"))
             self.after(0, self._load_events_and_display) # Refresh UI
         except Exception as e:
-            self.after(0, lambda: messagebox.showerror("爬蟲錯誤", f"執行爬蟲時發生錯誤: {e}"))
+            error_message = f"執行爬蟲時發生錯誤: {e}"
+            print(f"爬蟲錯誤: {error_message}")
+            self.after(0, lambda: messagebox.showerror("爬蟲錯誤", error_message))
             print(f"爬蟲執行錯誤: {e}")
             traceback.print_exc()
             
@@ -792,6 +810,7 @@ class EventCrawlerUI(tk.Tk):
             if new_date.upper() != 'N/A':
                 datetime.strptime(new_date, '%Y-%m-%d')
         except ValueError:
+            print("格式錯誤: 日期格式不正確。請使用 YYYY-MM-DD 格式，或填寫 'N/A'。")
             messagebox.showerror("格式錯誤", "日期格式不正確。請使用 YYYY-MM-DD 格式，或填寫 'N/A'。")
             return
 
@@ -822,11 +841,14 @@ class EventCrawlerUI(tk.Tk):
                 f.seek(0)
                 json.dump(all_events_in_file, f, ensure_ascii=False, indent=4)
                 f.truncate()
+            print("保存成功: 活動校正已保存。")
             messagebox.showinfo("保存成功", "活動校正已保存。")
             popup.destroy() # 關閉彈出視窗
             self.after(0, self._load_events_and_display) # 重新載入並顯示列表
         except Exception as e:
-            messagebox.showerror("保存錯誤", f"保存活動時發生錯誤: {e}")
+            error_message = f"保存活動時發生錯誤: {e}"
+            print(f"保存錯誤: {error_message}")
+            messagebox.showerror("保存錯誤", error_message)
             traceback.print_exc()
 
     def _delete_event(self, popup, venue_name, date_str, event_data):
@@ -850,16 +872,20 @@ class EventCrawlerUI(tk.Tk):
                         break
 
                 if not found:
+                    print("警告: 未能在檔案中找到要標記為刪除的活動。")
                     messagebox.showwarning("警告", "未能在檔案中找到要標記為刪除的活動。")
                     return
                 
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(all_events_in_file, f, ensure_ascii=False, indent=4)
+                print("標記成功: 活動已標記為刪除。")
                 messagebox.showinfo("標記成功", "活動已標記為刪除。")
                 popup.destroy()
                 self.after(0, self._load_events_and_display)
             except Exception as e:
-                messagebox.showerror("標記錯誤", f"標記活動為刪除時發生錯誤: {e}")
+                error_message = f"標記活動為刪除時發生錯誤: {e}"
+                print(f"標記錯誤: {error_message}")
+                messagebox.showerror("標記錯誤", error_message)
                 traceback.print_exc()
 
     def _toggle_delete_event(self, popup, venue_name, date_str, event_data, current_is_deleted):
@@ -869,6 +895,7 @@ class EventCrawlerUI(tk.Tk):
         success_message = f"活動已成功{action_text}。"
         error_message = f"在{action_text}活動時發生錯誤: "
 
+        print(f"確認{action_text}: {confirm_message}")
         if messagebox.askyesno(f"確認{action_text}", confirm_message):
             event_data['delete'] = new_delete_status
 
@@ -885,16 +912,20 @@ class EventCrawlerUI(tk.Tk):
                         break
 
                 if not found:
+                    print("警告: 未能在檔案中找到要更新的活動。")
                     messagebox.showwarning("警告", "未能在檔案中找到要更新的活動。")
                     return
                 
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(all_events_in_file, f, ensure_ascii=False, indent=4)
+                print(f"操作成功: {success_message}")
                 messagebox.showinfo("操作成功", success_message)
                 popup.destroy()
                 self.after(0, self._load_events_and_display)
             except Exception as e:
-                messagebox.showerror(f"{action_text}錯誤", f"{error_message}{e}")
+                full_error_message = f"{error_message}{e}"
+                print(f"{action_text}錯誤: {full_error_message}")
+                messagebox.showerror(f"{action_text}錯誤", full_error_message)
                 traceback.print_exc()
 
     def sync_website(self):       
@@ -974,9 +1005,11 @@ class EventCrawlerUI(tk.Tk):
                     }
                 with open(config_file, 'w', encoding='utf-8') as f:
                     json.dump(categories_config, f, ensure_ascii=False, indent=4)
+                print(f"自動生成完成: 已自動生成 {len(unknown_categories)} 個類別：{unknown_list}")
                 messagebox.showinfo("自動生成完成", f"已自動生成 {len(unknown_categories)} 個類別：{unknown_list}")
 
         if not all_checked_events:
+            print("同步網站提示: 沒有找到已校正且有標題的活動。")
             messagebox.showinfo("同步網站", "沒有找到已校正且有標題的活動。")
             return
 
@@ -1064,6 +1097,7 @@ class EventCrawlerUI(tk.Tk):
                 updated_html_content = re.sub(pattern_all_month_vars, replacement_block, updated_html_content, flags=re.DOTALL)
             else:
                 # 如果找不到標記，可以考慮報錯或使用舊的替換邏輯作為備用
+                print("同步警告: 在 HTML 檔案中找不到 // EVENT_DATA_START 和 // EVENT_DATA_END 標記。")
                 messagebox.showwarning("同步警告", "在 HTML 檔案中找不到 // EVENT_DATA_START 和 // EVENT_DATA_END 標記。")
                 return
 
@@ -1095,10 +1129,14 @@ class EventCrawlerUI(tk.Tk):
             with open(html_filepath, 'w', encoding='utf-8') as f:
                 f.write(updated_html_content)
 
-            messagebox.showinfo("同步網站", f"✅ 同步完成！\n\n• 活動數量：{len(all_checked_events)}\n• 類別數量：{len(categories_config)}")
+            success_message = f"✅ 同步完成！\n\n• 活動數量：{len(all_checked_events)}\n• 類別數量：{len(categories_config)}"
+            print(f"同步網站成功: {success_message.replace('✅ ', '').replace('\\n', ' ')}")
+            messagebox.showinfo("同步網站", success_message)
 
         except Exception as e:
-            messagebox.showerror("同步網站錯誤", f"更新 {html_filepath} 時發生錯誤: {e}")
+            error_message = f"更新 {html_filepath} 時發生錯誤: {e}"
+            print(f"同步網站錯誤: {error_message}")
+            messagebox.showerror("同步網站錯誤", error_message)
             print(f"更新 {html_filepath} 錯誤: {e}")
             traceback.print_exc()
 
@@ -1221,14 +1259,20 @@ class EventCrawlerUI(tk.Tk):
                     print(f"寫入檔案 {output_filepath} 時發生錯誤: {e}")
                     traceback.print_exc()
 
-            messagebox.showinfo("導入成功", f"已成功從 {html_filepath} 導入 {len(all_html_events)} 個活動，並更新了 {venues_imported_count} 個場地的檔案。")
+            info_message = f"已成功從 {html_filepath} 導入 {len(all_html_events)} 個活動，並更新了 {venues_imported_count} 個場地的檔案。"
+            print(f"導入成功: {info_message}")
+            messagebox.showinfo("導入成功", info_message)
             self._load_events_and_display() # 重新整理 UI
             
         except FileNotFoundError:
-            messagebox.showerror("錯誤", f"找不到檔案: {html_filepath}")
+            error_message = f"找不到檔案: {html_filepath}"
+            print(f"錯誤: {error_message}")
+            messagebox.showerror("錯誤", error_message)
             traceback.print_exc()
         except Exception as e:
-            messagebox.showerror("錯誤", f"導入活動時發生未預期錯誤: {e}")
+            error_message = f"導入活動時發生未預期錯誤: {e}"
+            print(f"錯誤: {error_message}")
+            messagebox.showerror("錯誤", error_message)
             traceback.print_exc()
 
     def _add_new_event_popup(self):
@@ -1305,16 +1349,19 @@ class EventCrawlerUI(tk.Tk):
 
         # 驗證日期格式
         if not new_event_data['date']:
+            print("輸入錯誤: 日期不能為空。")
             messagebox.showwarning("輸入錯誤", "日期不能為空。")
             return
         try:
             datetime.strptime(new_event_data['date'], '%Y-%m-%d')
         except ValueError:
+            print("輸入錯誤: 日期格式不正確。請使用 YYYY-MM-DD 格式。")
             messagebox.showwarning("輸入錯誤", "日期格式不正確。請使用 YYYY-MM-DD 格式。")
             return
 
         # 驗證場地
         if not new_event_data['venue']:
+            print("輸入錯誤: 場地不能為空。")
             messagebox.showwarning("輸入錯誤", "場地不能為空。")
             return
 
@@ -1339,12 +1386,16 @@ class EventCrawlerUI(tk.Tk):
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(existing_events, f, ensure_ascii=False, indent=4)
             
-            messagebox.showinfo("保存成功", f"活動已成功添加到 {new_event_data['venue']}。")
+            info_message = f"活動已成功添加到 {new_event_data['venue']}。"
+            print(f"保存成功: {info_message}")
+            messagebox.showinfo("保存成功", info_message)
             popup.destroy()
             self._load_events_and_display() # 重新整理 UI
 
         except Exception as e:
-            messagebox.showerror("保存錯誤", f"保存活動時發生錯誤: {e}")
+            error_message = f"保存活動時發生錯誤: {e}"
+            print(f"保存錯誤: {error_message}")
+            messagebox.showerror("保存錯誤", error_message)
             traceback.print_exc()
 
     def _manage_categories_popup(self):
@@ -1456,11 +1507,13 @@ class EventCrawlerUI(tk.Tk):
                 color2 = color2_entry.get().strip()
                 
                 if not code or not name:
+                    print("輸入錯誤: 代碼和名稱不能為空！")
                     messagebox.showwarning("輸入錯誤", "代碼和名稱不能為空！")
                     return
                 
                 categories = load_categories()
                 if code in categories:
+                    print(f"重複: 類別代碼 '{code}' 已存在！")
                     messagebox.showwarning("重複", f"類別代碼 '{code}' 已存在！")
                     return
                 
@@ -1470,6 +1523,7 @@ class EventCrawlerUI(tk.Tk):
                 save_categories(categories)
                 refresh_tree()
                 add_popup.destroy()
+                print(f"成功: 已新增類別 '{code}'")
                 messagebox.showinfo("成功", f"已新增類別 '{code}'")
             
             ttk.Button(frame, text="保存", command=save_new_category).grid(row=4, column=0, columnspan=2, pady=20)
@@ -1477,6 +1531,7 @@ class EventCrawlerUI(tk.Tk):
         def edit_category():
             selected = tree.selection()
             if not selected:
+                print("提示: 請選擇要編輯的類別！")
                 messagebox.showwarning("提示", "請選擇要編輯的類別！")
                 return
             
@@ -1484,6 +1539,7 @@ class EventCrawlerUI(tk.Tk):
             categories = load_categories()
             
             if code not in categories:
+                print("錯誤: 找不到該類別！")
                 messagebox.showwarning("錯誤", "找不到該類別！")
                 return
             
@@ -1532,6 +1588,7 @@ class EventCrawlerUI(tk.Tk):
                 color2 = color2_entry.get().strip()
                 
                 if not name:
+                    print("輸入錯誤: 名稱不能為空！")
                     messagebox.showwarning("輸入錯誤", "名稱不能為空！")
                     return
                 
@@ -1541,6 +1598,7 @@ class EventCrawlerUI(tk.Tk):
                 save_categories(categories)
                 refresh_tree()
                 edit_popup.destroy()
+                print(f"成功: 已更新類別 '{code}'")
                 messagebox.showinfo("成功", f"已更新類別 '{code}'")
             
             ttk.Button(frame, text="保存", command=save_edit).grid(row=4, column=0, columnspan=2, pady=20)
@@ -1548,17 +1606,21 @@ class EventCrawlerUI(tk.Tk):
         def delete_category():
             selected = tree.selection()
             if not selected:
+                print("提示: 請選擇要刪除的類別！")
                 messagebox.showwarning("提示", "請選擇要刪除的類別！")
                 return
             
             code = tree.item(selected[0], 'values')[0]
             
-            if messagebox.askyesno("確認刪除", f"確定要刪除類別 '{code}' 嗎？\n\n注意：使用此類別的活動不會被刪除。"):
+            confirm_message = f"確定要刪除類別 '{code}' 嗎？\n\n注意：使用此類別的活動不會被刪除。"
+            print(f"確認刪除: {confirm_message.replace('\\n', ' ')}")
+            if messagebox.askyesno("確認刪除", confirm_message):
                 categories = load_categories()
                 if code in categories:
                     del categories[code]
                     save_categories(categories)
                     refresh_tree()
+                    print(f"成功: 已刪除類別 '{code}'")
                     messagebox.showinfo("成功", f"已刪除類別 '{code}'")
         
         # 雙擊編輯
@@ -1653,11 +1715,13 @@ class EventCrawlerUI(tk.Tk):
                 name = name_entry.get().strip()
 
                 if not user_id or not name:
+                    print("輸入錯誤: ID 和名稱不能為空！")
                     messagebox.showwarning("輸入錯誤", "ID 和名稱不能為空！", parent=add_popup)
                     return
                 
                 users = load_users()
                 if any(u['user_id'] == user_id for u in users):
+                    print(f"重複: 使用者 ID '{user_id}' 已存在！")
                     messagebox.showwarning("重複", f"使用者 ID '{user_id}' 已存在！", parent=add_popup)
                     return
                 
@@ -1665,6 +1729,7 @@ class EventCrawlerUI(tk.Tk):
                 save_users(users)
                 refresh_tree()
                 add_popup.destroy()
+                print(f"成功: 已新增帳號 '{user_id}'")
                 messagebox.showinfo("成功", f"已新增帳號 '{user_id}'")
 
             ttk.Button(frame, text="保存", command=save_new_user).grid(row=2, column=0, columnspan=2, pady=10)
@@ -1672,6 +1737,7 @@ class EventCrawlerUI(tk.Tk):
         def edit_user():
             selected = tree.selection()
             if not selected:
+                print("提示: 請選擇要編輯的帳號！")
                 messagebox.showwarning("提示", "請選擇要編輯的帳號！")
                 return
 
@@ -1703,11 +1769,13 @@ class EventCrawlerUI(tk.Tk):
                 new_name = name_entry.get().strip()
 
                 if not new_user_id or not new_name:
+                    print("輸入錯誤: ID 和名稱不能為空！")
                     messagebox.showwarning("輸入錯誤", "ID 和名稱不能為空！", parent=edit_popup)
                     return
 
                 users = load_users()
                 if new_user_id != old_user_id and any(u['user_id'] == new_user_id for u in users):
+                    print(f"重複: 使用者 ID '{new_user_id}' 已存在！")
                     messagebox.showwarning("重複", f"使用者 ID '{new_user_id}' 已存在！", parent=edit_popup)
                     return
                 
@@ -1719,6 +1787,7 @@ class EventCrawlerUI(tk.Tk):
                 save_users(users)
                 refresh_tree()
                 edit_popup.destroy()
+                print(f"成功: 已更新帳號 '{new_user_id}'")
                 messagebox.showinfo("成功", f"已更新帳號 '{new_user_id}'")
             
             ttk.Button(frame, text="保存", command=save_edit).grid(row=2, column=0, columnspan=2, pady=10)
@@ -1726,16 +1795,20 @@ class EventCrawlerUI(tk.Tk):
         def delete_user():
             selected = tree.selection()
             if not selected:
+                print("提示: 請選擇要刪除的帳號！")
                 messagebox.showwarning("提示", "請選擇要刪除的帳號！")
                 return
             
             user_id = tree.item(selected[0], 'values')[0]
             
-            if messagebox.askyesno("確認刪除", f"確定要刪除帳號 '{user_id}' 嗎？"):
+            confirm_message = f"確定要刪除帳號 '{user_id}' 嗎？"
+            print(f"確認刪除: {confirm_message}")
+            if messagebox.askyesno("確認刪除", confirm_message):
                 users = load_users()
                 users = [user for user in users if user['user_id'] != user_id]
                 save_users(users)
                 refresh_tree()
+                print(f"成功: 已刪除帳號 '{user_id}'")
                 messagebox.showinfo("成功", f"已刪除帳號 '{user_id}'")
         
         tree.bind('<Double-1>', lambda e: edit_user())
@@ -1749,6 +1822,173 @@ class EventCrawlerUI(tk.Tk):
         ttk.Button(button_frame, text="✏️ 編輯選中", command=edit_user).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="🗑️ 刪除選中", command=delete_user).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="關閉", command=popup.destroy).pack(side=tk.RIGHT, padx=5)
+
+    def _manage_styles_popup(self):
+        """管理網站風格的彈出視窗"""
+        popup = tk.Toplevel(self)
+        popup.title("管理網站風格")
+
+        main_frame = ttk.Frame(popup, padding="20")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        ttk.Label(main_frame, text="選擇風格主題", font=('Arial', 14, 'bold')).pack(pady=10)
+
+        # 掃描 style_config 目錄
+        style_dir = './style_config'
+        styles = {}
+        if os.path.isdir(style_dir):
+            for filename in os.listdir(style_dir):
+                if filename.endswith('.json'):
+                    filepath = os.path.join(style_dir, filename)
+                    try:
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            style_data = json.load(f)
+                            if 'name' in style_data:
+                                styles[style_data['name']] = filepath
+                    except Exception as e:
+                        print(f"無法載入風格檔案 {filename}: {e}")
+                        traceback.print_exc()
+        
+        if not styles:
+            ttk.Label(main_frame, text="在 style_config 資料夾中找不到任何風格設定檔。").pack(pady=20)
+            ttk.Button(main_frame, text="關閉", command=popup.destroy).pack(pady=10)
+            return
+
+        # 風格選擇
+        style_frame = ttk.Frame(main_frame)
+        style_frame.pack(fill=tk.X, pady=10)
+        
+        ttk.Label(style_frame, text="選擇風格:").pack(side=tk.LEFT, padx=5)
+        
+        selected_style = tk.StringVar()
+        style_menu = ttk.Combobox(style_frame, textvariable=selected_style, values=list(styles.keys()), state="readonly")
+        style_menu.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
+        if styles:
+            style_menu.set(list(styles.keys())[0])
+
+        def _generate_css_from_style_data(style_data):
+            """從風格資料產生 CSS 字串"""
+            css_map = {
+                "body": {"background": style_data.get("body_background")},
+                "body::before": {"background": style_data.get("body_before_background")},
+                ".container": {
+                    "background": style_data.get("container_background"),
+                    "box-shadow": style_data.get("container_box_shadow"),
+                    "border": f"1px solid {style_data.get('border_color')}" if style_data.get('border_color') else None
+                },
+                ".calendar-header": {"background": style_data.get("header_background")},
+                ".calendar-header::before": {"background": style_data.get("header_before_background")},
+                ".day-header": {"background": style_data.get("day_header_background")},
+                ".day-header::before": {"background": style_data.get("day_header_before_background")},
+                ".day-cell": {
+                    "background": style_data.get("day_cell_background"),
+                    "border": f"1px solid {style_data.get('day_cell_border')}" if style_data.get('day_cell_border') else None
+                },
+                ".day-cell::before": {"background": style_data.get("day_cell_before_background")},
+                ".day-cell.today": {
+                    "background": style_data.get("today_background"),
+                    "border": f"1px solid {style_data.get('today_border')}" if style_data.get('today_border') else None,
+                    "box-shadow": style_data.get("today_box_shadow")
+                }
+            }
+            css_lines = []
+            for selector, properties in css_map.items():
+                css_lines.append(f"{selector} {{")
+                for prop, value in properties.items():
+                    if value:
+                        css_lines.append(f"    {prop}: {value};")
+                css_lines.append("}")
+            return "\n".join(css_lines)
+
+        def sync_style():
+            style_name = selected_style.get()
+            if not style_name:
+                print("未選擇: 請先選擇一個風格！")
+                messagebox.showwarning("未選擇", "請先選擇一個風格！", parent=popup)
+                return
+
+            html_filepath = filedialog.askopenfilename(
+                title="選擇要同步的 HTML 檔案",
+                filetypes=[("HTML 檔案", "*.html"), ("所有檔案", "*.*")],
+                initialdir="."
+            )
+            if not html_filepath:
+                return
+
+            try:
+                style_filepath = styles[style_name]
+                with open(style_filepath, 'r', encoding='utf-8') as f:
+                    style_data = json.load(f)
+
+                # 在終端機中印出風格資料以供除錯
+                print("--- [DEBUG] Style Data ---")
+                print(json.dumps(style_data, ensure_ascii=False, indent=2))
+                print("-------------------------")
+
+                # 讀取 HTML
+                with open(html_filepath, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+
+                # 找到 <style> 標籤
+                style_match = re.search(r"<style>([\s\S]*?)</style>", html_content, re.IGNORECASE)
+                if not style_match:
+                    print("錯誤: 在 HTML 檔案中找不到 <style> 標籤。")
+                    messagebox.showerror("錯誤", "在 HTML 檔案中找不到 <style> 標籤。", parent=popup)
+                    return
+                
+                current_css = style_match.group(1)
+                updated_css = current_css
+
+                # 定義要更新的 CSS 規則映射
+                css_updates = {
+                    r"body\s*\{[^}]*\}": f"body {{\n    background: {style_data.get('body_background', 'inherit')};\n}}",
+                    r"body::before\s*\{[^}]*\}": f"body::before {{\n    background: {style_data.get('body_before_background', 'none')};\n}}",
+                    r"\.container\s*\{[^}]*\}": f".container {{\n    background: {style_data.get('container_background', 'white')};\n    box-shadow: {style_data.get('container_box_shadow', 'none')};\n    border: 1px solid {style_data.get('border_color', 'transparent')};\n}}",
+                    r"\.calendar-header\s*\{[^}]*\}": f".calendar-header {{\n    background: {style_data.get('header_background', 'inherit')};\n}}",
+                    r"\.calendar-header::before\s*\{[^}]*\}": f".calendar-header::before {{\n    background: {style_data.get('header_before_background', 'none')};\n}}",
+                    r"\.day-header\s*\{[^}]*\}": f".day-header {{\n    background: {style_data.get('day_header_background', 'inherit')};\n}}",
+                    r"\.day-header::before\s*\{[^}]*\}": f".day-header::before {{\n    background: {style_data.get('day_header_before_background', 'none')};\n}}",
+                    r"\.day-cell\s*\{[^}]*\}": f".day-cell {{\n    background: {style_data.get('day_cell_background', 'white')};\n    border: 1px solid {style_data.get('day_cell_border', '#ddd')};\n}}",
+                    r"\.day-cell::before\s*\{[^}]*\}": f".day-cell::before {{\n    background: {style_data.get('day_cell_before_background', 'none')};\n}}",
+                    r"\.day-cell\.today\s*\{[^}]*\}": f".day-cell.today {{\n    background: {style_data.get('today_background', 'lightblue')};\n    border: 1px solid {style_data.get('today_border', '#4682B4')};\n    box-shadow: {style_data.get('today_box_shadow', 'none')};\n}}"
+                }
+
+                # 逐一替換 CSS 規則
+                for pattern_str, replacement in css_updates.items():
+                    updated_css = re.sub(pattern_str, replacement, updated_css, count=1, flags=re.IGNORECASE)
+
+                # 印出更新後的 CSS 片段以供除錯
+                print("--- [DEBUG] Updated CSS Rules ---")
+                for selector_pattern in css_updates.keys():
+                    match = re.search(selector_pattern, updated_css, re.IGNORECASE)
+                    if match:
+                        print(match.group(0))
+                print("----------------------------------")
+
+                # 替換整個 <style> 區塊
+                updated_html = html_content.replace(style_match.group(0), f"<style>{updated_css}</style>")
+                    
+                with open(html_filepath, 'w', encoding='utf-8') as f:
+                    f.write(updated_html)
+                
+                print(f"成功: 網站風格 '{style_name}' 已成功同步到 {html_filepath}")
+                messagebox.showinfo("成功", f"網站風格 '{style_name}' 已成功同步到\n{html_filepath}", parent=popup)
+
+            except Exception as e:
+                error_message = f"同步風格時發生錯誤: {e}"
+                print(f"同步失敗: {error_message}")
+                messagebox.showerror("同步失敗", error_message, parent=popup)
+                traceback.print_exc()
+
+        # 按鈕
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=20)
+        
+        sync_button = ttk.Button(button_frame, text="同步到網站", command=sync_style)
+        sync_button.pack(side=tk.LEFT, padx=10, expand=True, fill=tk.X)
+        
+        close_button = ttk.Button(button_frame, text="關閉", command=popup.destroy)
+        close_button.pack(side=tk.RIGHT, padx=10, expand=True, fill=tk.X)
 
     def on_closing(self):
         self.stop_crawler()
