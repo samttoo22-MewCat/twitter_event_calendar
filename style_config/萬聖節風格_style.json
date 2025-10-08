@@ -1,0 +1,20 @@
+{
+    "name": "萬聖節風格",
+    "description": "橙色與棕色主題的萬聖節配色方案",
+    "body_background": "radial-gradient(circle at 20% 80%, rgba(255, 165, 0, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 69, 0, 0.15) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(139, 69, 19, 0.1) 0%, transparent 50%), linear-gradient(135deg, #2c1810 0%, #4a2c2a 25%, #8b4513 50%, #cd853f 75%, #daa520 100%)",
+    "body_before_background": "radial-gradient(circle at 15% 25%, rgba(255, 140, 0, 0.08) 0%, transparent 25%), radial-gradient(circle at 85% 75%, rgba(255, 69, 0, 0.08) 0%, transparent 25%), radial-gradient(circle at 50% 10%, rgba(139, 69, 19, 0.05) 0%, transparent 30%)",
+    "container_background": "radial-gradient(circle at 30% 20%, rgba(255, 140, 0, 0.1) 0%, transparent 40%), radial-gradient(circle at 70% 80%, rgba(255, 165, 0, 0.08) 0%, transparent 35%), linear-gradient(135deg, rgba(255, 228, 196, 0.95) 0%, rgba(255, 218, 185, 0.95) 100%)",
+    "container_box_shadow": "0 10px 30px rgba(255, 140, 0, 0.2)",
+    "border_color": "rgba(255, 140, 0, 0.3)",
+    "header_background": "radial-gradient(ellipse at 25% 30%, rgba(255, 69, 0, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 75% 70%, rgba(255, 140, 0, 0.12) 0%, transparent 45%), linear-gradient(135deg, #cc4400, #ff6600, #ff8c00)",
+    "header_before_background": "repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px), repeating-linear-gradient(-45deg, transparent, transparent 12px, rgba(255, 165, 0, 0.08) 12px, rgba(255, 165, 0, 0.08) 24px)",
+    "day_header_background": "radial-gradient(circle at 40% 30%, rgba(255, 69, 0, 0.2) 0%, transparent 60%), linear-gradient(135deg, #b8860b, #daa520, #ff8c00)",
+    "day_header_before_background": "repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(255, 140, 0, 0.15) 4px, rgba(255, 140, 0, 0.15) 8px)",
+    "day_cell_background": "radial-gradient(circle at 20% 20%, rgba(255, 228, 196, 0.3) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255, 218, 185, 0.2) 0%, transparent 35%), linear-gradient(135deg, #fffaf0, #ffefd5)",
+    "day_cell_border": "rgba(255, 140, 0, 0.2)",
+    "day_cell_before_background": "repeating-linear-gradient(30deg, transparent, transparent 15px, rgba(255, 165, 0, 0.05) 15px, rgba(255, 165, 0, 0.05) 30px)",
+    "today_background": "radial-gradient(circle at 30% 30%, rgba(255, 140, 0, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(255, 165, 0, 0.3) 0%, transparent 45%), linear-gradient(135deg, #ffd700, #ffa500)",
+    "today_border": "#ff8c00",
+    "today_box_shadow": "0 0 15px rgba(255, 140, 0, 0.5)"
+}
+

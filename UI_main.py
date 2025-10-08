@@ -275,6 +275,9 @@ class EventCrawlerUI(tk.Tk):
         
         self.manage_categories_button = ttk.Button(button_frame, text="管理類別", command=self._manage_categories_popup)
         self.manage_categories_button.grid(row=2, column=2, columnspan=2, sticky=tk.EW, padx=2, pady=2)
+        
+        self.manage_styles_button = ttk.Button(button_frame, text="管理風格", command=self._manage_styles_popup)
+        self.manage_styles_button.grid(row=3, column=0, columnspan=4, sticky=tk.EW, padx=2, pady=2)
 
         # 事件列表區塊 - 改為 Notebook
         self.notebook = ttk.Notebook(self)
@@ -1541,6 +1544,332 @@ class EventCrawlerUI(tk.Tk):
         ttk.Button(button_frame, text="🗑️ 刪除選中", command=delete_category).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="🔄 重新整理", command=refresh_tree).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="關閉", command=popup.destroy).pack(side=tk.RIGHT, padx=5)
+
+    def _manage_styles_popup(self):
+        """管理網站風格的彈出視窗"""
+        popup = tk.Toplevel(self)
+        popup.title("管理網站風格")
+        popup.geometry("800x700")
+        
+        main_frame = ttk.Frame(popup, padding="10")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(main_frame, text="網站風格管理", font=('Arial', 14, 'bold')).pack(pady=5)
+        
+        # 風格清單
+        list_frame = ttk.LabelFrame(main_frame, text="已保存的風格", padding="10")
+        list_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+        
+        # 使用 Treeview 顯示風格
+        tree_frame = ttk.Frame(list_frame)
+        tree_frame.pack(fill=tk.BOTH, expand=True)
+        
+        tree = ttk.Treeview(tree_frame, columns=("名稱", "描述"), show="headings", height=10)
+        tree.heading("名稱", text="風格名稱")
+        tree.heading("描述", text="風格描述")
+        tree.column("名稱", width=200)
+        tree.column("描述", width=500)
+        
+        scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        
+        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # 預覽框
+        preview_frame = ttk.LabelFrame(main_frame, text="風格預覽", padding="10")
+        preview_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+        
+        preview_text = tk.Text(preview_frame, height=8, wrap=tk.WORD, state=tk.DISABLED)
+        preview_text.pack(fill=tk.BOTH, expand=True)
+        
+        # 初始化風格配置目錄
+        style_config_dir = './style_config'
+        os.makedirs(style_config_dir, exist_ok=True)
+        
+        def load_styles():
+            """載入所有風格配置"""
+            styles = {}
+            if os.path.exists(style_config_dir):
+                for filename in os.listdir(style_config_dir):
+                    if filename.endswith('_style.json'):
+                        filepath = os.path.join(style_config_dir, filename)
+                        try:
+                            with open(filepath, 'r', encoding='utf-8') as f:
+                                style_data = json.load(f)
+                                style_name = filename.replace('_style.json', '')
+                                styles[style_name] = style_data
+                        except Exception as e:
+                            print(f"載入風格 {filename} 時發生錯誤: {e}")
+                            traceback.print_exc()
+            return styles
+        
+        def save_style(style_name, style_data):
+            """保存風格配置"""
+            filename = f"{style_name}_style.json"
+            filepath = os.path.join(style_config_dir, filename)
+            try:
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    json.dump(style_data, f, ensure_ascii=False, indent=4)
+                return True
+            except Exception as e:
+                print(f"保存風格時發生錯誤: {e}")
+                traceback.print_exc()
+                return False
+        
+        def refresh_tree():
+            """刷新風格列表"""
+            for item in tree.get_children():
+                tree.delete(item)
+            
+            styles = load_styles()
+            for style_name in sorted(styles.keys()):
+                style_data = styles[style_name]
+                description = style_data.get('description', '無描述')
+                tree.insert("", "end", values=(style_name, description), iid=style_name)
+        
+        def on_style_select(event):
+            """當選擇風格時顯示預覽"""
+            selected = tree.selection()
+            if not selected:
+                return
+            
+            style_name = selected[0]
+            styles = load_styles()
+            if style_name in styles:
+                style_data = styles[style_name]
+                
+                preview_text.config(state=tk.NORMAL)
+                preview_text.delete(1.0, tk.END)
+                
+                # 顯示風格資訊
+                preview_content = f"風格名稱: {style_name}\n"
+                preview_content += f"描述: {style_data.get('description', '無描述')}\n\n"
+                preview_content += "主要配色:\n"
+                preview_content += f"  • Body 背景: {style_data.get('body_background', 'N/A')[:60]}...\n"
+                preview_content += f"  • Container 背景: {style_data.get('container_background', 'N/A')[:60]}...\n"
+                preview_content += f"  • Header 背景: {style_data.get('header_background', 'N/A')[:60]}...\n"
+                preview_content += f"  • 邊框顏色: {style_data.get('border_color', 'N/A')}\n"
+                
+                preview_text.insert(1.0, preview_content)
+                preview_text.config(state=tk.DISABLED)
+        
+        tree.bind('<<TreeviewSelect>>', on_style_select)
+        
+        def apply_style_to_html():
+            """將選中的風格應用到 HTML 檔案"""
+            selected = tree.selection()
+            if not selected:
+                messagebox.showwarning("提示", "請先選擇要應用的風格！")
+                return
+            
+            style_name = selected[0]
+            
+            # 讓用戶選擇要應用的 HTML 檔案
+            html_filepath = filedialog.askopenfilename(
+                title="選擇要應用風格的 HTML 檔案",
+                filetypes=[("HTML 檔案", "*.html"), ("所有檔案", "*.*")],
+                initialdir="."
+            )
+            if not html_filepath:
+                return
+            
+            styles = load_styles()
+            if style_name not in styles:
+                messagebox.showerror("錯誤", "找不到該風格配置！")
+                return
+            
+            style_data = styles[style_name]
+            
+            try:
+                with open(html_filepath, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+                
+                # 替換 CSS 樣式 - 使用 lambda 函數避免組引用錯誤
+                
+                # 1. Body background (多行)
+                if 'body_background' in style_data:
+                    html_content = re.sub(
+                        r'(body\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["body_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 2. Body::before background-image (多行)
+                if 'body_before_background' in style_data:
+                    html_content = re.sub(
+                        r'(body::before\s*\{[^}]*?background-image:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["body_before_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 3. Container background (多行)
+                if 'container_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.container\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["container_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 4. Container box-shadow
+                if 'container_box_shadow' in style_data:
+                    html_content = re.sub(
+                        r'(\.container\s*\{[^}]*?box-shadow:\s*)[^;]+;',
+                        lambda m: f'{m.group(1)}{style_data["container_box_shadow"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 5. Container border
+                if 'border_color' in style_data:
+                    html_content = re.sub(
+                        r'(\.container\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
+                        lambda m: f'{m.group(1)}{style_data["border_color"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 6. Header background (多行)
+                if 'header_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.header\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["header_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 7. Header::before background-image (多行)
+                if 'header_before_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.header::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["header_before_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 8. Day-header background (多行)
+                if 'day_header_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.day-header\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["day_header_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 9. Day-header::before background-image (多行)
+                if 'day_header_before_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.day-header::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["day_header_before_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 10. Day-cell background (多行)
+                if 'day_cell_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.day-cell\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["day_cell_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 11. Day-cell border
+                if 'day_cell_border' in style_data:
+                    html_content = re.sub(
+                        r'(\.day-cell\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
+                        lambda m: f'{m.group(1)}{style_data["day_cell_border"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 12. Day-cell::before background-image (多行)
+                if 'day_cell_before_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.day-cell::before\s*\{[^}]*?background-image:\s*)(?:repeating-linear-gradient|radial-gradient|linear-gradient)[^;]+;',
+                        lambda m: f'{m.group(1)}\n                {style_data["day_cell_before_background"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 13. Today background (當日日期的背景 - 多行)
+                if 'today_background' in style_data:
+                    html_content = re.sub(
+                        r'(\.today\s*\{[^}]*?background:\s*)(?:radial-gradient|linear-gradient)[^!]+!important;',
+                        lambda m: f'{m.group(1)}\n                {style_data["today_background"]} !important;',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 14. Today border (當日日期的邊框)
+                if 'today_border' in style_data:
+                    html_content = re.sub(
+                        r'(\.today\s*\{[^}]*?border:\s*\d+px\s+solid\s+)[^;]+;',
+                        lambda m: f'{m.group(1)}{style_data["today_border"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                # 15. Today box-shadow (當日日期的陰影)
+                if 'today_box_shadow' in style_data:
+                    html_content = re.sub(
+                        r'(\.today\s*\{[^}]*?box-shadow:\s*)[^;]+;',
+                        lambda m: f'{m.group(1)}{style_data["today_box_shadow"]};',
+                        html_content,
+                        flags=re.DOTALL
+                    )
+                
+                with open(html_filepath, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                
+                messagebox.showinfo("成功", f"已成功將「{style_name}」風格應用到 HTML 檔案！\n\n已更新的樣式元素：\n• Body 背景\n• Container 背景與邊框\n• Header 背景\n• 日期標題背景\n• 日期單元格背景與邊框\n• 當日日期強調樣式")
+            
+            except Exception as e:
+                messagebox.showerror("錯誤", f"應用風格時發生錯誤: {e}\n\n請檢查風格配置檔案格式是否正確。")
+                print(f"應用風格錯誤: {e}")
+                traceback.print_exc()
+        
+        def delete_style():
+            """刪除選中的風格"""
+            selected = tree.selection()
+            if not selected:
+                messagebox.showwarning("提示", "請選擇要刪除的風格！")
+                return
+            
+            style_name = selected[0]
+            
+            if messagebox.askyesno("確認刪除", f"確定要刪除風格「{style_name}」嗎？"):
+                filename = f"{style_name}_style.json"
+                filepath = os.path.join(style_config_dir, filename)
+                try:
+                    if os.path.exists(filepath):
+                        os.remove(filepath)
+                        messagebox.showinfo("成功", f"已刪除風格「{style_name}」")
+                        refresh_tree()
+                        preview_text.config(state=tk.NORMAL)
+                        preview_text.delete(1.0, tk.END)
+                        preview_text.config(state=tk.DISABLED)
+                except Exception as e:
+                    messagebox.showerror("錯誤", f"刪除風格時發生錯誤: {e}")
+                    traceback.print_exc()
+        
+        # 雙擊預覽
+        tree.bind('<Double-1>', lambda e: on_style_select(e))
+        
+        # 按鈕區
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=10)
+        
+        ttk.Button(button_frame, text="✅ 應用風格到 HTML", command=apply_style_to_html).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="🗑️ 刪除選中", command=delete_style).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="🔄 重新整理", command=refresh_tree).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="關閉", command=popup.destroy).pack(side=tk.RIGHT, padx=5)
+        
+        # 初始化列表
+        refresh_tree()
 
     def on_closing(self):
         self.stop_crawler()
